@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpExtras;
+using System;
 using System.Collections.Generic;
 
 namespace GameAI
@@ -42,7 +43,7 @@ namespace GameAI
                 while (!copy.IsGameOver())
                 {
                     copysLegalMoves = copy.GetLegalMoves();
-                    copy.DoMove(copysLegalMoves[rng.Next(0, copysLegalMoves.Count)]);
+                    copy.DoMove(copysLegalMoves.RandomItem());
                 }
 
                 moveStats[moveIndex].executions++;
