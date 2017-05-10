@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ExtraCoreLanguageFeatures;
+using CSharpExtras;
 
 namespace GameAI
 {

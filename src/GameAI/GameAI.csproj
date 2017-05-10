@@ -45,5 +45,11 @@
     <Compile Include="MonteCarloTreeMultiplayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CSharpExtras\src\CSharpExtras\CSharpExtras.csproj">
+      <Project>{de00ce4c-2e7d-4411-b56c-d9cc03bb82e9}</Project>
+      <Name>CSharpExtras</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
