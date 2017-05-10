@@ -62,8 +62,8 @@ namespace GameAI
             Game copy;
             List<Transition> allTransitions;
             List<Transition> transitionsNoStats;
-            
 
+            Random rng = new Random();
 
             for (int i = 0; i < simulations; i++)
             {
@@ -109,7 +109,7 @@ namespace GameAI
                     else
                     {
                         //select random move with no stats, do the move
-                        copy.DoMove(transitionsNoStats.RandomItem());
+                        copy.DoMove(transitionsNoStats.RandomItem(rng));
 
                         //add to the tree, and add to the path
                         Node n = new Node(copy.GetCurrentPlayer());

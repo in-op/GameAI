@@ -43,7 +43,7 @@ namespace GameAI
                 while (!copy.IsGameOver())
                 {
                     copysLegalMoves = copy.GetLegalMoves();
-                    copy.DoMove(copysLegalMoves.RandomItem());
+                    copy.DoMove(copysLegalMoves.RandomItem(rng));
                 }
 
                 moveStats[moveIndex].executions++;
