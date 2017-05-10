@@ -34,13 +34,19 @@ namespace GameAI
 
         public class Transition
         {
+            /// <summary>
+            /// The move to perform the transition
+            /// </summary>
             public Move move;
-            public long outcomeHash;
+            /// <summary>
+            /// The hash of the resulting gamestate
+            /// </summary>
+            public long hash;
 
-            public Transition(Move move, long outcomeHash)
+            public Transition(Move move, long hash)
             {
                 this.move = move;
-                this.outcomeHash = outcomeHash;
+                this.hash = hash;
             }
         }
 
@@ -72,7 +78,7 @@ namespace GameAI
                     allTransitions = copy.GetLegalTransitions(); 
                     transitionsNoStats = new List<Transition>(); 
                     foreach (Transition t in allTransitions) 
-                        if (!tree.ContainsKey(t.outcomeHash))
+                        if (!tree.ContainsKey(t.hash))
                             transitionsNoStats.Add(t);
                     
                     // SELECTION
@@ -85,7 +91,7 @@ namespace GameAI
                         //select move with highest UCB1
                         for (int j = 0; j < allTransitions.Count; j++)
                         {
-                            ucb1Score = tree[allTransitions[j].outcomeHash].UCBScoreForParent(parentPlays);
+                            ucb1Score = tree[allTransitions[j].hash].UCBScoreForParent(parentPlays);
                             if (ucb1Score > bestScore)
                             {
                                 bestScore = ucb1Score;
@@ -96,7 +102,7 @@ namespace GameAI
                         // do the move
                         copy.DoMove(bestTransition);
                         // add to path
-                        path.Add(tree[bestTransition.outcomeHash]);
+                        path.Add(tree[bestTransition.hash]);
                     }
 
                     // EXPANSION
@@ -136,14 +142,14 @@ namespace GameAI
 
             for (int i = 0; i < allTransitions.Count; i++)
             {
-                Node n = tree[allTransitions[i].outcomeHash];
+                Node n = tree[allTransitions[i].hash];
                 Console.WriteLine("Move {0}: plays-{1} wins-{2} plyr-{3}", i, n.plays, n.wins, n.player);
 
 
                 // **NOTE**
                 // The best move chosen is the move with gives the
                 // opponent the least number of victories
-                score = tree[allTransitions[i].outcomeHash].ScoreForCurrentPlayer();
+                score = tree[allTransitions[i].hash].ScoreForCurrentPlayer();
                 if (score < worstScoreFound)
                 {
                     worstScoreFound = score;
