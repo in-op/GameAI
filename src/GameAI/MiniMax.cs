@@ -23,8 +23,7 @@ namespace GameAI
             int score;
             foreach (Move move in game.GetLegalMoves())
             {
-                game.DoMove(move);
-                score = -NegaMax(game, player);
+                score = -NegaMax(game.DoMove(move), player);
                 if (score > bestScore)
                 {
                     bestScore = score;
