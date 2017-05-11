@@ -10,20 +10,18 @@ namespace GameAI
             Game DoMove(Move move);
             void UndoMove();
             bool IsGameOver();
-            int Score(int player);
-            int GetCurrentPlayer();
+            int CurrentPlayersScore();
         }
         public interface Move { }
 
         public static Move Search(Game game)
         {
-            int player = game.GetCurrentPlayer();
             int bestScore = int.MinValue;
             Move bestMove = null;
             int score;
             foreach (Move move in game.GetLegalMoves())
             {
-                score = -NegaMax(game.DoMove(move), player);
+                score = -NegaMax(game.DoMove(move));
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -34,16 +32,16 @@ namespace GameAI
             return bestMove;
         }
 
-        private static int NegaMax(Game game, int player)
+        private static int NegaMax(Game game)
         {
             if (game.IsGameOver())
-                return game.Score(game.GetCurrentPlayer());
+                return game.CurrentPlayersScore();
 
             int bestScore = int.MinValue;
             int score;
             foreach (Move move in game.GetLegalMoves())
             {
-                score = -NegaMax(game.DoMove(move), player);
+                score = -NegaMax(game.DoMove(move));
                 if (score > bestScore) bestScore = score;
                 game.UndoMove();
             }
