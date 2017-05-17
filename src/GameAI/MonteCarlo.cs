@@ -12,7 +12,7 @@ namespace GameAI
     public static class MonteCarlo
     {
         /// <summary>
-        /// Blank interface for Moves of Games
+        /// Blank interface for Moves of Games.
         /// </summary>
         public interface Move { }
 
@@ -26,7 +26,6 @@ namespace GameAI
             /// Returns a list of all legal moves
             /// possible from the current gamestate.
             /// </summary>
-            /// <returns></returns>
             List<Move> GetLegalMoves();
             /// <summary>
             /// Execute the move and update the gamestate.
@@ -42,7 +41,6 @@ namespace GameAI
             /// is a winner in the current gamestate.
             /// </summary>
             /// <param name="player">The player</param>
-            /// <returns></returns>
             bool IsWinner(int player);
             /// <summary>
             /// Returns a deep copy of the game.
