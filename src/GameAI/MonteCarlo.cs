@@ -4,23 +4,65 @@ using System.Collections.Generic;
 
 namespace GameAI
 {
+    /// <summary>
+    /// A method class for obtaining the
+    /// best Move from any Game by performing
+    /// Monte Carlo simulations.
+    /// </summary>
     public static class MonteCarlo
     {
+        /// <summary>
+        /// Blank interface for Moves of Games
+        /// </summary>
         public interface Move { }
 
+        /// <summary>
+        /// Interface for games that wish
+        /// to use the MonteCarlo AI.
+        /// </summary>
         public interface Game
         {
+            /// <summary>
+            /// Returns a list of all legal moves
+            /// possible from the current gamestate.
+            /// </summary>
+            /// <returns></returns>
             List<Move> GetLegalMoves();
-            void DoMove(Move m);
+            /// <summary>
+            /// Execute the move and update the gamestate.
+            /// </summary>
+            /// <param name="move">The move to perform.</param>
+            void DoMove(Move move);
+            /// <summary>
+            /// Returns whether the game is over or not.
+            /// </summary>
             bool IsGameOver();
+            /// <summary>
+            /// Returns whether the input player
+            /// is a winner in the current gamestate.
+            /// </summary>
+            /// <param name="player">The player</param>
+            /// <returns></returns>
             bool IsWinner(int player);
+            /// <summary>
+            /// Returns a deep copy of the game.
+            /// </summary>
             Game Copy();
+            /// <summary>
+            /// Returns the current player.
+            /// </summary>
             int GetCurrentPlayer();
         }
 
 
 
-
+        /// <summary>
+        /// Returns the move found to have highest win-rate
+        /// after performing the specified number of
+        /// Monte-Carlo simulations on the input game.
+        /// </summary>
+        /// <param name="game">The current game.</param>
+        /// <param name="simulations">The number of simulations to perform.</param>
         public static Move Search(Game game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
