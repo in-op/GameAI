@@ -48,6 +48,11 @@ namespace GameAI
                 this.move = move;
                 this.hash = hash;
             }
+
+            public override string ToString()
+            {
+                return "Move: " + move.ToString() + ". Hash: " + hash.ToString();
+            }
         }
 
         public interface Move { }
