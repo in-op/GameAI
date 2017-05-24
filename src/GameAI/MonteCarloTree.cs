@@ -93,7 +93,6 @@ namespace GameAI
                         float parentPlays = path[path.Count - 1].plays;
                         float ucb1Score;
                         int indexOfBestTransition = 0;
-                        //select move with highest UCB1
                         for (int j = 0; j < allTransitions.Count; j++)
                         {
                             ucb1Score = tree[allTransitions[j].hash].UCBScoreForParent(parentPlays);
@@ -104,19 +103,15 @@ namespace GameAI
                             }
                         }
                         Transition bestTransition = allTransitions[indexOfBestTransition];
-                        // do the move
                         copy.DoMove(bestTransition);
-                        // add to path
                         path.Add(tree[bestTransition.hash]);
                     }
 
                     // EXPANSION
                     else
                     {
-                        //select random move with no stats, do the move
                         copy.DoMove(transitionsNoStats.RandomItem(rng));
-
-                        //add to the tree, and add to the path
+                        
                         Node n = new Node(copy.GetCurrentPlayer());
                         tree.Add(copy.GetHash(), n);
                         path.Add(n);

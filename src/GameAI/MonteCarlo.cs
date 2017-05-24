@@ -1,4 +1,4 @@
-﻿using CSharpExtras;
+﻿using CSharpExtras.Random;
 using System;
 using System.Collections.Generic;
 
@@ -71,7 +71,6 @@ namespace GameAI
             for (int i = 0; i < count; i++) moveStats[i] = new MoveStats();
             int moveIndex;
             Game copy;
-            List<Move> copysLegalMoves;
             Random rng = new Random();
 
             for (int i = 0; i < simulations; i++)
@@ -81,10 +80,8 @@ namespace GameAI
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())
-                {
-                    copysLegalMoves = copy.GetLegalMoves();
-                    copy.DoMove(copysLegalMoves.RandomItem(rng));
-                }
+                    copy.DoMove(
+                        copy.GetLegalMoves().RandomItem(rng));
 
                 moveStats[moveIndex].executions++;
                 if (copy.IsWinner(aiPlayer)) moveStats[moveIndex].victories++;
@@ -117,11 +114,6 @@ namespace GameAI
             public float Score()
             {
                 return victories / executions;
-            }
-            public MoveStats()
-            {
-                executions = 0f;
-                victories = 0f;
             }
         }
     }
