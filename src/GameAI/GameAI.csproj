@@ -47,9 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CSharpExtras\src\CSharpExtras\CSharpExtras.csproj">
-      <Project>{de00ce4c-2e7d-4411-b56c-d9cc03bb82e9}</Project>
-      <Name>CSharpExtras</Name>
+    <ProjectReference Include="..\..\..\SystemExtensions\SystemExtensions\SystemExtensions.csproj">
+      <Project>{c975f5f0-272b-402f-ad69-e9576660b88a}</Project>
+      <Name>SystemExtensions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

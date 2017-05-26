@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CSharpExtras.Random;
+using SystemExtensions.Random;
 
 namespace GameAI
 {
