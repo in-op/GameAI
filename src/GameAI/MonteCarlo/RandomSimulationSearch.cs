@@ -2,36 +2,31 @@
 using System.Collections.Generic;
 using SystemExtensions.Random;
 
-namespace GameAI
+namespace GameAI.MonteCarlo
 {
-    /// <summary>
-    /// A method class for obtaining the
-    /// best Move from any Game by performing
-    /// Monte Carlo simulations.
-    /// </summary>
-    public static class MonteCarlo
+    public static class RandomSimulationSearch
     {
         /// <summary>
         /// Blank interface for Moves of Games.
         /// </summary>
-        public interface Move { }
+        public interface IMove { }
 
         /// <summary>
         /// Interface for games that wish
         /// to use the MonteCarlo AI.
         /// </summary>
-        public interface Game
+        public interface IGame
         {
             /// <summary>
             /// Returns a list of all legal moves
             /// possible from the current gamestate.
             /// </summary>
-            List<Move> GetLegalMoves();
+            List<IMove> GetLegalMoves();
             /// <summary>
             /// Execute the move and update the gamestate.
             /// </summary>
             /// <param name="move">The move to perform.</param>
-            void DoMove(Move move);
+            void DoMove(IMove move);
             /// <summary>
             /// Returns whether the game is over or not.
             /// </summary>
@@ -40,12 +35,12 @@ namespace GameAI
             /// Returns whether the input player
             /// is a winner in the current gamestate.
             /// </summary>
-            /// <param name="player">The player</param>
+            /// <param name="player">The player.</param>
             bool IsWinner(int player);
             /// <summary>
             /// Returns a deep copy of the game.
             /// </summary>
-            Game Copy();
+            IGame Copy();
             /// <summary>
             /// Returns the current player.
             /// </summary>
@@ -61,16 +56,16 @@ namespace GameAI
         /// </summary>
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
-        public static Move Search(Game game, int simulations)
+        public static IMove CalculateBestMove(IGame game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
             int aiPlayer = game.GetCurrentPlayer();
-            List<Move> legalMoves = game.GetLegalMoves();
+            List<IMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = new MoveStats[count];
             for (int i = 0; i < count; i++) moveStats[i] = new MoveStats();
             int moveIndex;
-            Game copy;
+            IGame copy;
             Random rng = new Random();
 
             for (int i = 0; i < simulations; i++)
@@ -102,7 +97,7 @@ namespace GameAI
             return legalMoves[bestMoveFound];
         }
 
-        
+
 
 
 

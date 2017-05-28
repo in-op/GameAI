@@ -54,19 +54,17 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="SystemExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SystemExtensions\SystemExtensions\bin\Release\SystemExtensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MiniMax.cs" />
-    <Compile Include="MonteCarlo.cs" />
-    <Compile Include="MonteCarloTree.cs" />
     <Compile Include="MonteCarloTreeMultiplayer.cs" />
+    <Compile Include="MonteCarlo\RandomSimulationSearch.cs" />
+    <Compile Include="MonteCarlo\UCB1TreeSearch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\SystemExtensions\SystemExtensions\SystemExtensions.csproj">
-      <Project>{c975f5f0-272b-402f-ad69-e9576660b88a}</Project>
-      <Name>SystemExtensions</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

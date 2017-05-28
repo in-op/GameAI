@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GameAI
 {
-    public static class MonteCarloTreeMultiplayer
+    class MonteCarloTreeMultiplayer
     {
-        public interface Game
+        public interface IGame
         {
             /// <summary>
             /// Returns the current player, represented as an int.
@@ -15,7 +18,7 @@ namespace GameAI
             /// <summary>
             /// Returns a deep copy of the game.
             /// </summary>
-            Game DeepCopy();
+            IGame DeepCopy();
             /// <summary>
             /// Perform the specified transition. Implementations
             /// must update the hash value.
@@ -38,10 +41,10 @@ namespace GameAI
 
         public class Transition
         {
-            public Move move;
+            public IMove move;
             public long hash;
 
-            public Transition(Move move, long hash)
+            public Transition(IMove move, long hash)
             {
                 this.move = move;
                 this.hash = hash;
@@ -53,6 +56,6 @@ namespace GameAI
             }
         }
 
-        public interface Move { }
+        public interface IMove { }
     }
 }

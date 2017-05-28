@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using SystemExtensions.Random;
 
-namespace GameAI
+namespace GameAI.MonteCarlo
 {
+
     /// <summary>
     /// A method class for selecting moves in
     /// determinsitic, two-player, back-and-forth,
     /// zero-sum or zero-sum-tie games
     /// </summary>
-    public static class MonteCarloTree
+    public static class UCB1TreeSearch
     {
-        public interface Game
+        public interface IGame
         {
             int GetCurrentPlayer();
-            Game DeepCopy();
+            IGame DeepCopy();
             /// <summary>
             /// Perform the specified transition. Implementations
             /// must update the hash value.
@@ -37,13 +38,13 @@ namespace GameAI
             /// <summary>
             /// The move to perform the transition
             /// </summary>
-            public Move move;
+            public IMove move;
             /// <summary>
             /// The hash of the resulting gamestate
             /// </summary>
             public long hash;
 
-            public Transition(Move move, long hash)
+            public Transition(IMove move, long hash)
             {
                 this.move = move;
                 this.hash = hash;
@@ -55,16 +56,16 @@ namespace GameAI
             }
         }
 
-        public interface Move { }
+        public interface IMove { }
 
-        public static Transition Search(Game game, int simulations)
+        public static Transition CalculateBestMove(IGame game, int simulations)
         {
             Dictionary<long, Node> tree = new Dictionary<long, Node>();
             tree.Add(game.GetHash(), new Node(game.GetCurrentPlayer()));
 
             List<Node> path = new List<Node>();
 
-            Game copy;
+            IGame copy;
             List<Transition> allTransitions;
             List<Transition> transitionsNoStats;
 
@@ -72,22 +73,22 @@ namespace GameAI
 
             for (int i = 0; i < simulations; i++)
             {
-                copy = game.DeepCopy();  
-                path.Clear(); 
-                path.Add(tree[game.GetHash()]); 
-                
+                copy = game.DeepCopy();
+                path.Clear();
+                path.Add(tree[game.GetHash()]);
+
                 while (true)
                 {
                     if (copy.IsGameOver()) break;
-                    
-                    allTransitions = copy.GetLegalTransitions(); 
-                    transitionsNoStats = new List<Transition>(); 
-                    foreach (Transition t in allTransitions) 
+
+                    allTransitions = copy.GetLegalTransitions();
+                    transitionsNoStats = new List<Transition>();
+                    foreach (Transition t in allTransitions)
                         if (!tree.ContainsKey(t.hash))
                             transitionsNoStats.Add(t);
-                    
+
                     // SELECTION
-                    if (transitionsNoStats.Count == 0) 
+                    if (transitionsNoStats.Count == 0)
                     {
                         float bestScore = float.MinValue;
                         float parentPlays = path[path.Count - 1].plays;
@@ -111,11 +112,11 @@ namespace GameAI
                     else
                     {
                         copy.DoMove(transitionsNoStats.RandomItem(rng));
-                        
+
                         Node n = new Node(copy.GetCurrentPlayer());
                         tree.Add(copy.GetHash(), n);
                         path.Add(n);
-                        
+
                         break;
                     }
                 }
@@ -186,7 +187,7 @@ namespace GameAI
 
             public float UCBScoreForParent(float parentPlays)
             {   // plays - wins indicates how many winners for the opposing player (the player of the parent node)
-                return UCB1(plays - wins, plays, parentPlays); 
+                return UCB1(plays - wins, plays, parentPlays);
             }
 
             private Node() { }
