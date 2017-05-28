@@ -11,14 +11,15 @@ namespace GameAI
             /// Returns the current player, represented as an int.
             /// All n players are represented as a number 0,..,n - 1.
             /// </summary>
-            /// <returns></returns>
             int GetCurrentPlayer();
+            /// <summary>
+            /// Returns a deep copy of the game.
+            /// </summary>
             Game DeepCopy();
             /// <summary>
             /// Perform the specified transition. Implementations
             /// must update the hash value.
             /// </summary>
-            /// <param name="t"></param>
             void DoMove(Transition t);
             /// <summary>
             /// Perform any random move. To optimize this method,
@@ -30,7 +31,6 @@ namespace GameAI
             /// Returns an array, indexed by numeric player representations,
             /// that specifies, for that player, a win (+1), loss (-1), or tie (0).
             /// </summary>
-            /// <returns></returns>
             int[] GetOutcome();
             List<Transition> GetLegalTransitions();
             long GetHash();
