@@ -35,7 +35,7 @@ namespace GameAI.MonteCarlo
             /// <summary>
             /// Returns a deep copy of the game.
             /// </summary>
-            IGame<TMove> Copy();
+            IGame<TMove> DeepCopy();
             /// <summary>
             /// Returns the current player.
             /// </summary>
@@ -66,7 +66,7 @@ namespace GameAI.MonteCarlo
             for (int i = 0; i < simulations; i++)
             {
                 moveIndex = rng.Next(0, count);
-                copy = game.Copy();
+                copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())
