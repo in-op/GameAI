@@ -7,26 +7,22 @@ namespace GameAI.MonteCarlo
     public static class RandomSimulation
     {
         /// <summary>
-        /// Blank interface for Moves of Games.
-        /// </summary>
-        public interface IMove { }
-
-        /// <summary>
         /// Interface for games that wish
         /// to use the MonteCarlo AI.
         /// </summary>
-        public interface IGame
+        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
+        public interface IGame<TMove>
         {
             /// <summary>
             /// Returns a list of all legal moves
             /// possible from the current gamestate.
             /// </summary>
-            List<IMove> GetLegalMoves();
+            List<TMove> GetLegalMoves();
             /// <summary>
             /// Execute the move and update the gamestate.
             /// </summary>
             /// <param name="move">The move to perform.</param>
-            void DoMove(IMove move);
+            void DoMove(TMove move);
             /// <summary>
             /// Returns whether the game is over or not.
             /// </summary>
@@ -40,7 +36,7 @@ namespace GameAI.MonteCarlo
             /// <summary>
             /// Returns a deep copy of the game.
             /// </summary>
-            IGame Copy();
+            IGame<TMove> DeepCopy();
             /// <summary>
             /// Returns the current player.
             /// </summary>
@@ -56,22 +52,23 @@ namespace GameAI.MonteCarlo
         /// </summary>
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
-        public static IMove Search(IGame game, int simulations)
+        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
+        public static TMove Search<TMove>(IGame<TMove> game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
             int aiPlayer = game.GetCurrentPlayer();
-            List<IMove> legalMoves = game.GetLegalMoves();
+            List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = new MoveStats[count];
             for (int i = 0; i < count; i++) moveStats[i] = new MoveStats();
             int moveIndex;
-            IGame copy;
+            IGame<TMove> copy;
             Random rng = new Random();
 
             for (int i = 0; i < simulations; i++)
             {
                 moveIndex = rng.Next(0, count);
-                copy = game.Copy();
+                copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())

@@ -63,7 +63,6 @@
     <Compile Include="MiniMax.cs" />
     <Compile Include="MonteCarloTreeMultiplayer.cs" />
     <Compile Include="MonteCarlo\RandomSimulation.cs" />
-    <Compile Include="MonteCarlo\RandomSimulationGeneric.cs" />
     <Compile Include="MonteCarlo\UCB1Tree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
