@@ -10,7 +10,7 @@ namespace GameAI.MonteCarlo
     /// determinsitic, two-player, back-and-forth,
     /// zero-sum or zero-sum-tie games
     /// </summary>
-    public static class UCB1TreeSearch
+    public static class UCB1Tree
     {
         public interface IGame
         {
@@ -58,7 +58,7 @@ namespace GameAI.MonteCarlo
 
         public interface IMove { }
 
-        public static Transition CalculateBestMove(IGame game, int simulations)
+        public static Transition Search(IGame game, int simulations)
         {
             Dictionary<long, Node> tree = new Dictionary<long, Node>();
             tree.Add(game.GetHash(), new Node(game.GetCurrentPlayer()));

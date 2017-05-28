@@ -4,7 +4,7 @@ using SystemExtensions.Random;
 
 namespace GameAI.MonteCarlo
 {
-    public static class RandomSimulationSearch
+    public static class RandomSimulation
     {
         /// <summary>
         /// Blank interface for Moves of Games.
@@ -56,7 +56,7 @@ namespace GameAI.MonteCarlo
         /// </summary>
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
-        public static IMove CalculateBestMove(IGame game, int simulations)
+        public static IMove Search(IGame game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
             int aiPlayer = game.GetCurrentPlayer();
