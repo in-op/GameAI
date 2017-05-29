@@ -91,12 +91,12 @@ namespace GameAI.MonteCarlo
         }
 
 
-        private class LoopVars
+        private class ThreadLocalVars
         {
             internal Random random;
             internal List<Node> path;
 
-            internal LoopVars(Random random, List<Node> path)
+            internal ThreadLocalVars(Random random, List<Node> path)
             {
                 this.random = random;
                 this.path = path;
@@ -111,21 +111,18 @@ namespace GameAI.MonteCarlo
             sw.Start();
             Parallel.For(0L, Int64.MaxValue,
 
-                () => new LoopVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)),
+                () => new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)),
 
                 (i, loop, localVars) =>
                 {
-                    if (sw.ElapsedMilliseconds > milliseconds)
-                        loop.Break();
+                    if (sw.ElapsedMilliseconds > milliseconds) loop.Stop();
 
                     IGame<TMove> copy = game.DeepCopy();
                     localVars.path.Clear();
                     localVars.path.Add(tree[game.GetHash()]);
 
-                    while (true)
+                    while (!copy.IsGameOver())
                     {
-                        if (copy.IsGameOver()) break;
-
                         List<Transition<TMove>> transitions = copy.GetLegalTransitions();
                         List<Transition<TMove>> transitionsNoStats = new List<Transition<TMove>>();
                         foreach (Transition<TMove> t in transitions)
@@ -229,7 +226,7 @@ namespace GameAI.MonteCarlo
 
             Parallel.For(0, simulations,
 
-                () => new LoopVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)),
+                () => new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)),
                 
                 (i, loop, localVars) =>
                 {
@@ -237,10 +234,8 @@ namespace GameAI.MonteCarlo
                     localVars.path.Clear();
                     localVars.path.Add(tree[game.GetHash()]);
 
-                    while (true)
+                    while (!copy.IsGameOver())
                     {
-                        if (copy.IsGameOver()) break;
-
                         List<Transition<TMove>>  transitions = copy.GetLegalTransitions();
                         List<Transition<TMove>> transitionsNoStats = new List<Transition<TMove>>();
                         foreach (Transition<TMove> t in transitions)
@@ -336,6 +331,131 @@ namespace GameAI.MonteCarlo
 
 
 
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// Returns the best Transition discovered after performing the specified number of simulations on the game.
+        /// </summary>
+        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
+        /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
+        /// <param name="milliseconds">The number of milliseconds to run the simulations.</param>
+        public static Transition<TMove> Search<TMove>(IGame<TMove> game, long milliseconds)
+        {
+            Dictionary<long, Node> tree = new Dictionary<long, Node>();
+            tree.Add(game.GetHash(), new Node(game.GetCurrentPlayer()));
+
+            List<Node> path = new List<Node>();
+
+            IGame<TMove> copy;
+            List<Transition<TMove>> allTransitions;
+            List<Transition<TMove>> transitionsNoStats;
+
+            Random rng = new Random();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < milliseconds)
+            {
+                copy = game.DeepCopy();
+                path.Clear();
+                path.Add(tree[game.GetHash()]);
+
+                while (!copy.IsGameOver())
+                {
+                    allTransitions = copy.GetLegalTransitions();
+                    transitionsNoStats = new List<Transition<TMove>>();
+                    foreach (Transition<TMove> t in allTransitions)
+                        if (!tree.ContainsKey(t.Hash))
+                            transitionsNoStats.Add(t);
+
+                    // SELECTION
+                    if (transitionsNoStats.Count == 0)
+                    {
+                        double bestScore = float.MinValue;
+                        int parentPlays = path[path.Count - 1].plays;
+                        double ucb1Score;
+                        int indexOfBestTransition = 0;
+                        for (int j = 0; j < allTransitions.Count; j++)
+                        {
+                            ucb1Score = tree[allTransitions[j].Hash].UCBScoreForParent(parentPlays);
+                            if (ucb1Score > bestScore)
+                            {
+                                bestScore = ucb1Score;
+                                indexOfBestTransition = j;
+                            }
+                        }
+                        Transition<TMove> bestTransition = allTransitions[indexOfBestTransition];
+                        copy.DoMove(bestTransition);
+                        path.Add(tree[bestTransition.Hash]);
+                    }
+
+                    // EXPANSION
+                    else
+                    {
+                        copy.DoMove(transitionsNoStats.RandomItem(rng));
+
+                        Node n = new Node(copy.GetCurrentPlayer());
+                        tree.Add(copy.GetHash(), n);
+                        path.Add(n);
+
+                        break;
+                    }
+                }
+
+                // ROLLOUT
+                while (!copy.IsGameOver())
+                    copy.DoRandomMove();
+
+                // BACKPROP
+                foreach (Node n in path)
+                {
+                    n.plays++;
+                    if (copy.WhoWon() == n.player) n.wins++;
+                }
+            }
+
+            // Simulations are over. Pick the best move, then return it
+            allTransitions = game.GetLegalTransitions();
+            int indexOfBestMoveFound = 0;
+            double worstScoreFound = double.MaxValue;
+            double score;
+
+            //Console.WriteLine("Root: plays-{0} wins-{1} plyr-{2}", tree[game.GetHash()].plays, tree[game.GetHash()].wins, tree[game.GetHash()].player);
+
+            for (int i = 0; i < allTransitions.Count; i++)
+            {
+                Node n = tree[allTransitions[i].Hash];
+                //Console.WriteLine("Move {0}: plays-{1} wins-{2} plyr-{3}", i, n.plays, n.wins, n.player);
+
+
+                // **NOTE**
+                // The best move chosen is the move with gives the
+                // opponent the least number of victories
+                score = tree[allTransitions[i].Hash].ScoreForCurrentPlayer();
+                if (score < worstScoreFound)
+                {
+                    worstScoreFound = score;
+                    indexOfBestMoveFound = i;
+                }
+            }
+
+            return allTransitions[indexOfBestMoveFound];
+        }
+
+
+
+
+
+
+
+
+
         /// <summary>
         /// Returns the best Transition discovered after performing the specified number of simulations on the game.
         /// </summary>
@@ -361,10 +481,8 @@ namespace GameAI.MonteCarlo
                 path.Clear();
                 path.Add(tree[game.GetHash()]);
 
-                while (true)
+                while (!copy.IsGameOver())
                 {
-                    if (copy.IsGameOver()) break;
-
                     allTransitions = copy.GetLegalTransitions();
                     transitionsNoStats = new List<Transition<TMove>>();
                     foreach (Transition<TMove> t in allTransitions)
