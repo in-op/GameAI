@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using SystemExtensions;
 using SystemExtensions.Random;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GameAI.MonteCarlo
 {
@@ -43,20 +46,7 @@ namespace GameAI.MonteCarlo
             /// </summary>
             int GetCurrentPlayer();
         }
-
-
-
-        public static TMove Search<TMove>(IGame<TMove> game, int simulations, bool useParallel)
-        {
-            if (useParallel)
-            {
-
-            }
-            else
-            {
-                return Search(game, simulations);
-            }
-        }
+        
 
 
         private class LocalLoopVariables<TMove>
@@ -83,8 +73,43 @@ namespace GameAI.MonteCarlo
 
         public static TMove ParallelSearch<TMove>(IGame<TMove> game, int simulations)
         {
+            int aiPlayer = game.GetCurrentPlayer();
             List<TMove> legalMoves = game.GetLegalMoves();
+            int count = legalMoves.Count;
+            MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
+            
+            Random rng = new Random();
 
+
+            Parallel.For(0, simulations, (i) =>
+            {
+                int moveIndex = rng.Next(0, count);
+                IGame<TMove> copy = game.DeepCopy();
+                copy.DoMove(legalMoves[moveIndex]);
+
+                while (!copy.IsGameOver())
+                    copy.DoMove(
+                        copy.GetLegalMoves().RandomItem(rng));
+
+                Interlocked.Add(ref moveStats[moveIndex].executions, 1);
+                if (copy.IsWinner(aiPlayer))
+                    Interlocked.Add(ref moveStats[moveIndex].victories, 1);
+            });
+            
+
+            int bestMoveFound = 0;
+            double bestScoreFound = 0f;
+            for (int i = 0; i < count; i++)
+            {
+                double score = moveStats[i].Score();
+                if (score > bestScoreFound)
+                {
+                    bestScoreFound = score;
+                    bestMoveFound = i;
+                }
+            }
+
+            return legalMoves[bestMoveFound];
 
         }
 
@@ -98,7 +123,7 @@ namespace GameAI.MonteCarlo
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
-            public static TMove Search<TMove>(IGame<TMove> game, int simulations)
+        public static TMove Search<TMove>(IGame<TMove> game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
             int aiPlayer = game.GetCurrentPlayer();
@@ -124,10 +149,10 @@ namespace GameAI.MonteCarlo
             }
 
             int bestMoveFound = 0;
-            float bestScoreFound = 0f;
+            double bestScoreFound = 0f;
             for (int i = 0; i < count; i++)
             {
-                float score = moveStats[i].Score();
+                double score = moveStats[i].Score();
                 if (score > bestScoreFound)
                 {
                     bestScoreFound = score;
@@ -144,12 +169,14 @@ namespace GameAI.MonteCarlo
 
         private class MoveStats
         {
-            public float executions;
-            public float victories;
+            public int executions;
+            public int victories;
 
-            public float Score()
+            public double Score()
             {
-                return victories / executions;
+                double vics = victories;
+                double execs = executions;
+                return vics / execs;
             }
         }
     }
