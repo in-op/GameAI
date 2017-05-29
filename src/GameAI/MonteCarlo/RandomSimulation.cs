@@ -47,6 +47,14 @@ namespace GameAI.MonteCarlo
         }
 
 
+        private class LocalVars<TMove>
+        {
+            internal Random random;
+            internal int moveIndex;
+            internal IGame<TMove> copy;
+        }
+
+
         /// <summary>
         /// Returns the move found to have highest win-rate after performing, in parallel, the specified number of Monte-Carlo simulations on the input game.
         /// </summary>
@@ -82,12 +90,10 @@ namespace GameAI.MonteCarlo
             },
 
 
-
                 (x) => { }
-                
             );
-            
 
+            
             int bestMoveFound = 0;
             double bestScoreFound = 0f;
             for (int i = 0; i < count; i++)
