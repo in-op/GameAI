@@ -46,37 +46,14 @@ namespace GameAI.MonteCarlo
             /// </summary>
             int GetCurrentPlayer();
         }
-        
 
-
-        private class LocalLoopVariables<TMove>
-        {
-            public int aiPlayer;
-            public List<TMove> legalMoves;
-            public int count;
-            public MoveStats[] moveStats;
-            public int moveIndex;
-            public IGame<TMove> copy;
-            public Random rng;
-
-            public LocalLoopVariables(int aiPlayer, List<TMove> legalMoves, int count, MoveStats[] moveStats, int moveIndex, IGame<TMove> copy, Random rng)
-            {
-                this.aiPlayer = aiPlayer;
-                this.legalMoves = legalMoves;
-                this.count = count;
-                this.moveStats = moveStats;
-                this.moveIndex = moveIndex;
-                this.copy = copy;
-                this.rng = rng;
-            }
-        }
 
         /// <summary>
         /// BUGGY: performs the first move of the legal moves an inordinate amount of times: it should be randomly distributed.
         /// </summary>
-        /// <typeparam name="TMove"></typeparam>
-        /// <param name="game"></param>
-        /// <param name="simulations"></param>
+        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
+        /// <param name="game">The current game.</param>
+        /// <param name="simulations">The number of simulations to perform.</param>
         public static TMove ParallelSearch<TMove>(IGame<TMove> game, int simulations)
         {
             int aiPlayer = game.GetCurrentPlayer();
@@ -84,22 +61,32 @@ namespace GameAI.MonteCarlo
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
 
+            Parallel.For(0, simulations,
 
-            Parallel.For(0, simulations, (i) =>
+                () => ThreadLocalRandom.NewRandom(),
+
+                (i, loop, localRandom) =>
             {
-                Random rng = ThreadLocalRandom.NewRandom();
-                int moveIndex = rng.Next(0, count);
+                int moveIndex = localRandom.Next(0, count);
                 IGame<TMove> copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())
                     copy.DoMove(
-                        copy.GetLegalMoves().RandomItem(rng));
+                        copy.GetLegalMoves().RandomItem(localRandom));
 
                 Interlocked.Add(ref moveStats[moveIndex].executions, 1);
                 if (copy.IsWinner(aiPlayer))
                     Interlocked.Add(ref moveStats[moveIndex].victories, 1);
-            });
+
+                return localRandom;
+            },
+
+
+
+                (x) => { }
+                
+            );
             
 
             int bestMoveFound = 0;
@@ -113,6 +100,9 @@ namespace GameAI.MonteCarlo
                     bestMoveFound = i;
                 }
             }
+
+            //for (int i = 0; i < legalMoves.Count; i++)
+            //    Console.WriteLine("Move " + legalMoves[i] + " has " + moveStats[i].victories + " victories / " + moveStats[i].executions + " executions.");
 
             return legalMoves[bestMoveFound];
 
