@@ -71,18 +71,23 @@ namespace GameAI.MonteCarlo
             }
         }
 
+        /// <summary>
+        /// BUGGY: performs the first move of the legal moves an inordinate amount of times: it should be randomly distributed.
+        /// </summary>
+        /// <typeparam name="TMove"></typeparam>
+        /// <param name="game"></param>
+        /// <param name="simulations"></param>
         public static TMove ParallelSearch<TMove>(IGame<TMove> game, int simulations)
         {
             int aiPlayer = game.GetCurrentPlayer();
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
-            
-            Random rng = new Random();
 
 
             Parallel.For(0, simulations, (i) =>
             {
+                Random rng = ThreadLocalRandom.NewRandom();
                 int moveIndex = rng.Next(0, count);
                 IGame<TMove> copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
@@ -107,6 +112,11 @@ namespace GameAI.MonteCarlo
                     bestScoreFound = score;
                     bestMoveFound = i;
                 }
+            }
+
+            for (int i = 0; i < legalMoves.Count; i++)
+            {
+                Console.WriteLine("Move " + legalMoves[i] + " has " + moveStats[i].victories + " wins / " + moveStats[i].executions + " plays");
             }
 
             return legalMoves[bestMoveFound];
