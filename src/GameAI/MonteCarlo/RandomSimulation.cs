@@ -49,7 +49,7 @@ namespace GameAI.MonteCarlo
 
 
         /// <summary>
-        /// BUGGY: performs the first move of the legal moves an inordinate amount of times: it should be randomly distributed.
+        /// Returns the move found to have highest win-rate after performing, in parallel, the specified number of Monte-Carlo simulations on the input game.
         /// </summary>
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
         /// <param name="game">The current game.</param>
@@ -111,9 +111,7 @@ namespace GameAI.MonteCarlo
 
 
         /// <summary>
-        /// Returns the move found to have highest win-rate
-        /// after performing the specified number of
-        /// Monte-Carlo simulations on the input game.
+        /// Returns the move found to have highest win-rate after performing the specified number of Monte-Carlo simulations on the input game.
         /// </summary>
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
