@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using SystemExtensions.Random;
 
 namespace GameAI.MonteCarlo
@@ -109,7 +108,7 @@ namespace GameAI.MonteCarlo
             tree.TryAdd(game.GetHash(), new Node(game.GetCurrentPlayer()));
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            Parallel.For(0L, Int64.MaxValue,
+            ParallelNET35.Parallel.For(0L, Int64.MaxValue,
 
                 () => new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)),
 
@@ -224,7 +223,7 @@ namespace GameAI.MonteCarlo
             tree.TryAdd(game.GetHash(), new Node(game.GetCurrentPlayer()));
             
 
-            Parallel.For(0, simulations,
+            ParallelNET35.Parallel.For(0, simulations,
 
                 () => new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)),
                 

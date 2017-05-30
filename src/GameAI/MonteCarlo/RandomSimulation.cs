@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SystemExtensions;
 using SystemExtensions.Random;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace GameAI.MonteCarlo
 {
@@ -68,7 +67,7 @@ namespace GameAI.MonteCarlo
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
 
-            Parallel.For(0, simulations,
+            ParallelNET35.Parallel.For(0, simulations,
 
                 () => ThreadLocalRandom.NewRandom(),
 
