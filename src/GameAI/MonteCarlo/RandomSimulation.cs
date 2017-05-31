@@ -88,8 +88,8 @@ namespace GameAI.MonteCarlo
                 return localRandom;
             },
 
-
                 (x) => { }
+
             );
 
             

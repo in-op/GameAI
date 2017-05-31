@@ -2,7 +2,10 @@
 
 namespace GameAI
 {
-    class MonteCarloTreeMultiplayer
+    /// <summary>
+    /// IN PROGRESS
+    /// </summary>
+    public class MonteCarloTreeMultiplayer
     {
         public interface IGame
         {
