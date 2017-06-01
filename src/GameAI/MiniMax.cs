@@ -13,20 +13,20 @@ namespace GameAI
         /// An interface for Games that
         /// wish to use the MiniMax AI.
         /// </summary>
-        public interface Game
+        public interface IGame<TMove>
         {
             /// <summary>
             /// Returns a list of legal moves
             /// for the current gamestate.
             /// </summary>
-            List<Move> GetLegalMoves();
+            List<TMove> GetLegalMoves();
             /// <summary>
             /// Perform the input move on
             /// the game and return the updated
             /// game.
             /// </summary>
             /// <param name="move">The move to perform.</param>
-            Game DoMove(Move move);
+            IGame<TMove> DoMove(TMove move);
             /// <summary>
             /// Update the gamestate to
             /// completely undo the previous move.
@@ -42,23 +42,18 @@ namespace GameAI
             /// </summary>
             int CurrentPlayersScore();
         }
-        /// <summary>
-        /// Blank interface for Move objects
-        /// of the game.
-        /// </summary>
-        public interface Move { }
 
         /// <summary>
         /// Returns the best Move found by performing
         /// a full MiniMax gamestate search.
         /// </summary>
         /// <param name="game">The gamestate from which to begin the search.</param>
-        public static Move Search(Game game)
+        public static TMove Search<TMove>(IGame<TMove> game)
         {
             int bestScore = int.MinValue;
-            Move bestMove = null;
+            TMove bestMove = default(TMove);
             int score;
-            foreach (Move move in game.GetLegalMoves())
+            foreach (TMove move in game.GetLegalMoves())
             {
                 score = -NegaMax(game.DoMove(move));
                 if (score > bestScore)
@@ -71,14 +66,14 @@ namespace GameAI
             return bestMove;
         }
 
-        private static int NegaMax(Game game)
+        private static int NegaMax<TMove>(IGame<TMove> game)
         {
             if (game.IsGameOver())
                 return game.CurrentPlayersScore();
 
             int bestScore = int.MinValue;
             int score;
-            foreach (Move move in game.GetLegalMoves())
+            foreach (TMove move in game.GetLegalMoves())
             {
                 score = -NegaMax(game.DoMove(move));
                 if (score > bestScore) bestScore = score;
