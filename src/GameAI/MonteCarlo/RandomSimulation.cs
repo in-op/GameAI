@@ -62,7 +62,7 @@ namespace GameAI.MonteCarlo
 
             ParallelNET35.Parallel.For(0, simulations,
 
-                () => ThreadLocalRandom.NewRandom(),
+                () => ThreadLocalRandom.Instance,
 
                 (i, loop, localRandom) =>
             {
