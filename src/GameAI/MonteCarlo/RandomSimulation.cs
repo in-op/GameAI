@@ -44,14 +44,7 @@ namespace GameAI.MonteCarlo
             /// </summary>
             int GetCurrentPlayer();
         }
-
-
-        private class LocalVars<TMove>
-        {
-            internal Random random;
-            internal int moveIndex;
-            internal IGame<TMove> copy;
-        }
+        
 
 
         /// <summary>
