@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace GameAI
+namespace GameAI.MonteCarlo
 {
-    /// <summary>
-    /// IN PROGRESS
-    /// </summary>
-    public class MonteCarloTreeMultiplayer
+    public static class UCB1TreeMultiplayer
     {
-        public interface IGame
+        public interface IGame<TMove>
         {
             /// <summary>
             /// Returns the current player, represented as an int.
@@ -17,12 +18,12 @@ namespace GameAI
             /// <summary>
             /// Returns a deep copy of the game.
             /// </summary>
-            IGame DeepCopy();
+            IGame<TMove> DeepCopy();
             /// <summary>
             /// Perform the specified transition. Implementations
             /// must update the hash value.
             /// </summary>
-            void DoMove(Transition t);
+            void DoMove(Transition<TMove> t);
             /// <summary>
             /// Perform any random move. To optimize this method,
             /// omit the use and update of the hash value.
@@ -34,16 +35,16 @@ namespace GameAI
             /// that specifies, for that player, a win (+1), loss (-1), or tie (0).
             /// </summary>
             int[] GetOutcome();
-            List<Transition> GetLegalTransitions();
+            List<Transition<TMove>> GetLegalTransitions();
             long GetHash();
         }
 
-        public class Transition
+        public class Transition<TMove>
         {
-            public IMove move;
+            public TMove move;
             public long hash;
 
-            public Transition(IMove move, long hash)
+            public Transition(TMove move, long hash)
             {
                 this.move = move;
                 this.hash = hash;
@@ -54,7 +55,6 @@ namespace GameAI
                 return "Move: " + move.ToString() + ". Hash: " + hash.ToString();
             }
         }
-
-        public interface IMove { }
+        
     }
 }
