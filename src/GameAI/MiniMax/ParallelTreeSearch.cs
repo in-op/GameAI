@@ -50,7 +50,7 @@ namespace GameAI.MiniMax
 
         /// <summary>
         /// Returns the best Move found by performing
-        /// a full MiniMax gamestate search.
+        /// a full MiniMax gamestate search in parallel.
         /// </summary>
         /// <param name="game">The gamestate from which to begin the search.</param>
         public static TMove Search<TMove>(IGame<TMove> game)
