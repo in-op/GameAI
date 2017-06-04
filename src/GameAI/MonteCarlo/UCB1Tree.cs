@@ -89,19 +89,12 @@ namespace GameAI.MonteCarlo
             }
         }
 
-
-        private class ThreadLocalVars
-        {
-            internal Random random;
-            internal List<Node> path;
-
-            internal ThreadLocalVars(Random random, List<Node> path)
-            {
-                this.random = random;
-                this.path = path;
-            }
-        }
-
+        /// <summary>
+        /// Returns the best Transition discovered after performing the specified number of simulations, in parallel, on the game.
+        /// </summary>
+        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
+        /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
+        /// <param name="milliseconds">The length of time the search to run.</param>
         public static Transition<TMove> ParallelSearch<TMove>(IGame<TMove> game, long milliseconds)
         {
             ConcurrentDictionary<long, Node> tree = new ConcurrentDictionary<long, Node>();
@@ -344,7 +337,7 @@ namespace GameAI.MonteCarlo
         /// </summary>
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
         /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
-        /// <param name="milliseconds">The number of milliseconds to run the simulations.</param>
+        /// <param name="milliseconds">The length of time search will run.</param>
         public static Transition<TMove> Search<TMove>(IGame<TMove> game, long milliseconds)
         {
             Dictionary<long, Node> tree = new Dictionary<long, Node>();
@@ -600,6 +593,20 @@ namespace GameAI.MonteCarlo
                 this.player = player;
                 plays = 0;
                 wins = 0;
+            }
+        }
+
+
+
+        private class ThreadLocalVars
+        {
+            internal Random random;
+            internal List<Node> path;
+
+            internal ThreadLocalVars(Random random, List<Node> path)
+            {
+                this.random = random;
+                this.path = path;
             }
         }
 
