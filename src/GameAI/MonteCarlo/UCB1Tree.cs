@@ -103,7 +103,7 @@ namespace GameAI.MonteCarlo
             sw.Start();
             ParallelNET35.Parallel.For(0L, Int64.MaxValue,
 
-                () => new ThreadLocalVars(ThreadLocalRandom.Instance, new List<Node>(50)),
+                () => { return new ThreadLocalVars(ThreadLocalRandom.Instance, new List<Node>(50)); },
 
                 (i, loop, localVars) =>
                 {
@@ -218,7 +218,7 @@ namespace GameAI.MonteCarlo
 
             ParallelNET35.Parallel.For(0, simulations,
 
-                () => new ThreadLocalVars(ThreadLocalRandom.Instance, new List<Node>(50)),
+                () => { return new ThreadLocalVars(ThreadLocalRandom.Instance, new List<Node>(50)); },
                 
                 (i, loop, localVars) =>
                 {
