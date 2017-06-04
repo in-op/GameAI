@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace GameAI
+namespace GameAI.MiniMax
 {
     /// <summary>
     /// A method class to select moves in games
     /// that are two-player, back-and-forth,
     /// deterministic, and zero-sum or zero-sum-tie.
     /// </summary>
-    public static class MiniMax
+    public static class ParallelTreeSearch
     {
         /// <summary>
         /// An interface for Games that
@@ -41,6 +41,11 @@ namespace GameAI
             /// turn it is in this current gamestate.
             /// </summary>
             int CurrentPlayersScore();
+            /// <summary>
+            /// Returns a deep copy of the caller.
+            /// </summary>
+            /// <returns></returns>
+            IGame<TMove> DeepCopy();
         }
 
         /// <summary>
@@ -50,19 +55,32 @@ namespace GameAI
         /// <param name="game">The gamestate from which to begin the search.</param>
         public static TMove Search<TMove>(IGame<TMove> game)
         {
+            object locker = new object();
             int bestScore = int.MinValue;
             TMove bestMove = default(TMove);
-            int score;
-            foreach (TMove move in game.GetLegalMoves())
-            {
-                score = -NegaMax(game.DoMove(move));
-                if (score > bestScore)
+            List<TMove> moves = game.GetLegalMoves();
+
+            ParallelNET35.Parallel.For(0, moves.Count,
+
+                () => { return game.DeepCopy(); },
+
+                delegate(int i, ParallelNET35.Parallel.ParallelLoopState state, IGame<TMove> copy)
                 {
-                    bestScore = score;
-                    bestMove = move;
-                }
-                game.UndoMove();
-            }
+                    int score = -NegaMax(copy.DoMove(moves[i]));
+                    lock (locker)
+                    {
+                        if (score > bestScore)
+                        {
+                            bestScore = score;
+                            bestMove = moves[i];
+                        }
+                    }
+                    copy.UndoMove();
+                    return copy;
+                },
+
+                (copy) => { });
+
             return bestMove;
         }
 
