@@ -13,20 +13,14 @@ namespace GameAI.MiniMax
         /// An interface for Games that
         /// wish to use the MiniMax AI.
         /// </summary>
-        public interface IGame<TMove>
+        public interface IGame<TMove> :
+            IDoMove<TMove>
         {
             /// <summary>
             /// Returns a list of legal moves
             /// for the current gamestate.
             /// </summary>
             List<TMove> GetLegalMoves();
-            /// <summary>
-            /// Perform the input move on
-            /// the game and return the updated
-            /// game.
-            /// </summary>
-            /// <param name="move">The move to perform.</param>
-            IGame<TMove> DoMove(TMove move);
             /// <summary>
             /// Update the gamestate to
             /// completely undo the previous move.
@@ -55,7 +49,8 @@ namespace GameAI.MiniMax
             int score;
             foreach (TMove move in game.GetLegalMoves())
             {
-                score = -NegaMax(game.DoMove(move));
+                game.DoMove(move);
+                score = -NegaMax(game);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -75,7 +70,8 @@ namespace GameAI.MiniMax
             int score;
             foreach (TMove move in game.GetLegalMoves())
             {
-                score = -NegaMax(game.DoMove(move));
+                game.DoMove(move);
+                score = -NegaMax(game);
                 if (score > bestScore) bestScore = score;
                 game.UndoMove();
             }

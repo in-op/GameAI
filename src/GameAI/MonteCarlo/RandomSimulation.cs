@@ -14,18 +14,15 @@ namespace GameAI.MonteCarlo
         /// to use the MonteCarlo AI.
         /// </summary>
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
-        public interface IGame<TMove> : ICopyable<IGame<TMove>>
+        public interface IGame<TMove> :
+            ICopyable<IGame<TMove>>,
+            IDoMove<TMove>
         {
             /// <summary>
             /// Returns a list of all legal moves
             /// possible from the current gamestate.
             /// </summary>
             List<TMove> GetLegalMoves();
-            /// <summary>
-            /// Execute the move and update the gamestate.
-            /// </summary>
-            /// <param name="move">The move to perform.</param>
-            void DoMove(TMove move);
             /// <summary>
             /// Returns whether the game is over or not.
             /// </summary>

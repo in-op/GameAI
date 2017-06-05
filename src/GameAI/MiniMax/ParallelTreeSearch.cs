@@ -14,20 +14,15 @@ namespace GameAI.MiniMax
         /// An interface for Games that
         /// wish to use the MiniMax AI.
         /// </summary>
-        public interface IGame<TMove> : ICopyable<IGame<TMove>>
+        public interface IGame<TMove> :
+            ICopyable<IGame<TMove>>,
+            IDoMove<TMove>
         {
             /// <summary>
             /// Returns a list of legal moves
             /// for the current gamestate.
             /// </summary>
             List<TMove> GetLegalMoves();
-            /// <summary>
-            /// Perform the input move on
-            /// the game and return the updated
-            /// game.
-            /// </summary>
-            /// <param name="move">The move to perform.</param>
-            IGame<TMove> DoMove(TMove move);
             /// <summary>
             /// Update the gamestate to
             /// completely undo the previous move.
@@ -62,7 +57,8 @@ namespace GameAI.MiniMax
 
                 delegate(int i, ParallelNET35.Parallel.ParallelLoopState state, IGame<TMove> copy)
                 {
-                    int score = -NegaMax(copy.DoMove(moves[i]));
+                    copy.DoMove(moves[i]);
+                    int score = -NegaMax(copy);
                     lock (locker)
                     {
                         if (score > bestScore)
@@ -89,7 +85,8 @@ namespace GameAI.MiniMax
             int score;
             foreach (TMove move in game.GetLegalMoves())
             {
-                score = -NegaMax(game.DoMove(move));
+                game.DoMove(move);
+                score = -NegaMax(game);
                 if (score > bestScore) bestScore = score;
                 game.UndoMove();
             }

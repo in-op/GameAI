@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDoMove.cs" />
     <Compile Include="MiniMax\ParallelTreeSearch.cs" />
     <Compile Include="MiniMax\TreeSearch.cs" />
     <Compile Include="MonteCarlo\RandomSimulation.cs" />
