@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SystemExtensions.Copying;
 
 namespace GameAI.MiniMax
 {
@@ -13,7 +14,7 @@ namespace GameAI.MiniMax
         /// An interface for Games that
         /// wish to use the MiniMax AI.
         /// </summary>
-        public interface IGame<TMove>
+        public interface IGame<TMove> : ICopyable<IGame<TMove>>
         {
             /// <summary>
             /// Returns a list of legal moves
@@ -41,11 +42,6 @@ namespace GameAI.MiniMax
             /// turn it is in this current gamestate.
             /// </summary>
             int CurrentPlayersScore();
-            /// <summary>
-            /// Returns a deep copy of the caller.
-            /// </summary>
-            /// <returns></returns>
-            IGame<TMove> DeepCopy();
         }
 
         /// <summary>

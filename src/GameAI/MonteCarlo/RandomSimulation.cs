@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SystemExtensions;
 using SystemExtensions.Random;
+using SystemExtensions.Copying;
 using System.Threading;
 
 namespace GameAI.MonteCarlo
@@ -13,7 +14,7 @@ namespace GameAI.MonteCarlo
         /// to use the MonteCarlo AI.
         /// </summary>
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
-        public interface IGame<TMove>
+        public interface IGame<TMove> : ICopyable<IGame<TMove>>
         {
             /// <summary>
             /// Returns a list of all legal moves
@@ -35,10 +36,6 @@ namespace GameAI.MonteCarlo
             /// </summary>
             /// <param name="player">The player.</param>
             bool IsWinner(int player);
-            /// <summary>
-            /// Returns a deep copy of the game.
-            /// </summary>
-            IGame<TMove> DeepCopy();
             /// <summary>
             /// Returns the current player.
             /// </summary>

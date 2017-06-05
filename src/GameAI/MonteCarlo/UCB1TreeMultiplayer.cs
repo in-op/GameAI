@@ -1,20 +1,17 @@
 ﻿using System.Collections.Generic;
+using SystemExtensions.Copying;
 
 namespace GameAI.MonteCarlo
 {
     public static class UCB1TreeMultiplayer
     {
-        public interface IGame<TMove>
+        public interface IGame<TMove> : ICopyable<IGame<TMove>>
         {
             /// <summary>
             /// Returns the current player, represented as an int.
             /// All n players are represented as a number 0,..,n - 1.
             /// </summary>
             int GetCurrentPlayer();
-            /// <summary>
-            /// Returns a deep copy of the game.
-            /// </summary>
-            IGame<TMove> DeepCopy();
             /// <summary>
             /// Perform the specified transition. Implementations
             /// must update the hash value.

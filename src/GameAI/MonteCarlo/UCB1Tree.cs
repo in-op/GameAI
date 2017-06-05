@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using SystemExtensions.Copying;
 using SystemExtensions.Random;
 
 namespace GameAI.MonteCarlo
@@ -17,16 +18,12 @@ namespace GameAI.MonteCarlo
         /// The interface games must implement in order to use the Monte Carlo tree search algorithm.
         /// </summary>
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
-        public interface IGame<TMove>
+        public interface IGame<TMove> : ICopyable<IGame<TMove>>
         {
             /// <summary>
             /// Returns the current player in int representation.
             /// </summary>
             int GetCurrentPlayer();
-            /// <summary>
-            /// Returns a deep copy of the game.
-            /// </summary>
-            IGame<TMove> DeepCopy();
             /// <summary>
             /// Perform the specified transition. Implementations must update the hash value.
             /// </summary>
