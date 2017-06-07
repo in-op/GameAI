@@ -7,15 +7,14 @@ using System.Threading;
 
 namespace GameAI.MonteCarlo
 {
-    public static class RandomSimulation
+    public static class RandomSimulation<TGame, TMove>
+        where TGame : RandomSimulation<TGame, TMove>.IGame
     {
         /// <summary>
-        /// Interface for games that wish
-        /// to use the MonteCarlo AI.
+        /// Interface for games that wish to use the MonteCarlo AI.
         /// </summary>
-        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
-        public interface IGame<TMove> :
-            ICopyable<IGame<TMove>>,
+        public interface IGame :
+            ICopyable<TGame>,
             IDoMove<TMove>,
             IGameOver,
             ICurrentPlayer,
@@ -34,10 +33,9 @@ namespace GameAI.MonteCarlo
         /// <summary>
         /// Returns the move found to have highest win-rate after performing, in parallel, the specified number of Monte-Carlo simulations on the input game.
         /// </summary>
-        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
-        public static TMove ParallelSearch<TMove>(IGame<TMove> game, int simulations)
+        public static TMove ParallelSearch(TGame game, int simulations)
         {
             int aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
@@ -51,7 +49,7 @@ namespace GameAI.MonteCarlo
                 (i, loop, localRandom) =>
             {
                 int moveIndex = localRandom.Next(0, count);
-                IGame<TMove> copy = game.DeepCopy();
+                TGame copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())
@@ -96,8 +94,7 @@ namespace GameAI.MonteCarlo
         /// </summary>
         /// <param name="game">The current game.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
-        /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
-        public static TMove Search<TMove>(IGame<TMove> game, int simulations)
+        public static TMove Search(TGame game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
             int aiPlayer = game.CurrentPlayer;
@@ -105,7 +102,7 @@ namespace GameAI.MonteCarlo
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
             int moveIndex;
-            IGame<TMove> copy;
+            TGame copy;
             Random rng = new Random();
 
             for (int i = 0; i < simulations; i++)

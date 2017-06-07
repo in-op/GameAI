@@ -8,26 +8,24 @@ namespace GameAI.MiniMax
     /// that are two-player, back-and-forth,
     /// deterministic, and zero-sum or zero-sum-tie.
     /// </summary>
-    public static class ParallelTreeSearch
+    public static class ParallelTreeSearch<TGame, TMove>
+        where TGame : ParallelTreeSearch<TGame, TMove>.IGame
     {
         /// <summary>
-        /// An interface for Games that
-        /// wish to use the MiniMax AI.
+        /// An interface for Games that wish to use the MiniMax AI.
         /// </summary>
-        public interface IGame<TMove> :
-            ICopyable<IGame<TMove>>,
+        public interface IGame :
+            ICopyable<TGame>,
             IDoMove<TMove>,
             IGameOver,
             ILegalMoves<TMove>
         {
             /// <summary>
-            /// Update the gamestate to
-            /// completely undo the previous move.
+            /// Update the gamestate to completely undo the previous move.
             /// </summary>
             void UndoMove();
             /// <summary>
-            /// Return the score for the player whos
-            /// turn it is in this current gamestate.
+            /// Return the score for the player whos turn it is in this current gamestate.
             /// </summary>
             int CurrentPlayersScore();
         }
@@ -37,7 +35,7 @@ namespace GameAI.MiniMax
         /// a full MiniMax gamestate search in parallel.
         /// </summary>
         /// <param name="game">The gamestate from which to begin the search.</param>
-        public static TMove Search<TMove>(IGame<TMove> game)
+        public static TMove Search(TGame game)
         {
             object locker = new object();
             int bestScore = int.MinValue;
@@ -48,7 +46,7 @@ namespace GameAI.MiniMax
 
                 () => { return game.DeepCopy(); },
 
-                delegate(int i, ParallelNET35.Parallel.ParallelLoopState state, IGame<TMove> copy)
+                delegate(int i, ParallelNET35.Parallel.ParallelLoopState state, TGame copy)
                 {
                     copy.DoMove(moves[i]);
                     int score = -NegaMax(copy);
@@ -69,7 +67,7 @@ namespace GameAI.MiniMax
             return bestMove;
         }
 
-        private static int NegaMax<TMove>(IGame<TMove> game)
+        private static int NegaMax(TGame game)
         {
             if (game.IsGameOver())
                 return game.CurrentPlayersScore();

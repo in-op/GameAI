@@ -3,10 +3,11 @@ using SystemExtensions.Copying;
 
 namespace GameAI.MonteCarlo
 {
-    public static class UCB1TreeMultiplayer
+    public static class UCB1TreeMultiplayer<TGame, TMove>
+        where TGame : UCB1TreeMultiplayer<TGame, TMove>.IGame
     {
-        public interface IGame<TMove> :
-            ICopyable<IGame<TMove>>,
+        public interface IGame :
+            ICopyable<TGame>,
             IInt64Hash,
             IGameOver,
             ICurrentPlayer
@@ -15,7 +16,7 @@ namespace GameAI.MonteCarlo
             /// Perform the specified transition. Implementations
             /// must update the hash value.
             /// </summary>
-            void DoMove(Transition<TMove> t);
+            void DoMove(Transition t);
             /// <summary>
             /// Perform any random move. To optimize this method,
             /// omit the use and update of the hash value.
@@ -26,10 +27,10 @@ namespace GameAI.MonteCarlo
             /// that specifies, for that player, a win (+1), loss (-1), or tie (0).
             /// </summary>
             int[] GetOutcome();
-            List<Transition<TMove>> GetLegalTransitions();
+            List<Transition> GetLegalTransitions();
         }
 
-        public class Transition<TMove>
+        public class Transition
         {
             public TMove move;
             public long hash;
