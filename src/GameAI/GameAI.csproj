@@ -68,6 +68,7 @@
     <Compile Include="IGameOver.cs" />
     <Compile Include="IInt64Hash.cs" />
     <Compile Include="ILegalMoves.cs" />
+    <Compile Include="IUndoMove.cs" />
     <Compile Include="MiniMax\ParallelTreeSearch.cs" />
     <Compile Include="MiniMax\TreeSearch.cs" />
     <Compile Include="MonteCarlo\RandomSimulation.cs" />

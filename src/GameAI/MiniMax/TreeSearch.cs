@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace GameAI.MiniMax
+﻿namespace GameAI.MiniMax
 {
     /// <summary>
     /// A method class to select moves in games
@@ -16,12 +14,9 @@ namespace GameAI.MiniMax
         public interface IGame :
             IDoMove<TMove>,
             IGameOver,
-            ILegalMoves<TMove>
+            ILegalMoves<TMove>,
+            IUndoMove
         {
-            /// <summary>
-            /// Update the gamestate to completely undo the previous move.
-            /// </summary>
-            void UndoMove();
             /// <summary>
             /// Return the score for the player whos turn it is in this current gamestate.
             /// </summary>

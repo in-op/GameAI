@@ -18,12 +18,9 @@ namespace GameAI.MiniMax
             ICopyable<TGame>,
             IDoMove<TMove>,
             IGameOver,
-            ILegalMoves<TMove>
+            ILegalMoves<TMove>,
+            IUndoMove
         {
-            /// <summary>
-            /// Update the gamestate to completely undo the previous move.
-            /// </summary>
-            void UndoMove();
             /// <summary>
             /// Return the score for the player whos turn it is in this current gamestate.
             /// </summary>
