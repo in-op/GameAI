@@ -24,13 +24,9 @@ namespace GameAI.Algorithms.MonteCarlo
             IInt64Hash,
             IGameOver,
             ICurrentPlayer<TPlayer>,
-            IWinner<TPlayer>
+            IWinner<TPlayer>,
+            ITransition<Transition>
         {
-            /// <summary>
-            /// Perform the specified transition. Implementations must update the hash value.
-            /// </summary>
-            /// <param name="t">The transition to perform.</param>
-            void DoMove(Transition t);
             /// <summary>
             /// Perform any random move. To optimize this method, omit the use and update of the hash value.
             /// </summary>
@@ -123,14 +119,14 @@ namespace GameAI.Algorithms.MonteCarlo
                                 }
                             }
                             Transition bestTransition = transitions[indexOfBestTransition];
-                            copy.DoMove(bestTransition);
+                            copy.Transition(bestTransition);
                             localVars.path.Add(tree[bestTransition.Hash]);
                         }
 
                         // EXPANSION
                         else
                         {
-                            copy.DoMove(transitionsNoStats.RandomItem(localVars.random));
+                            copy.Transition(transitionsNoStats.RandomItem(localVars.random));
 
                             Node n = new Node(copy.CurrentPlayer);
                             tree.TryAdd(copy.Hash, n);
@@ -235,14 +231,14 @@ namespace GameAI.Algorithms.MonteCarlo
                                 }
                             }
                             Transition bestTransition = transitions[indexOfBestTransition];
-                            copy.DoMove(bestTransition);
+                            copy.Transition(bestTransition);
                             localVars.path.Add(tree[bestTransition.Hash]);
                         }
 
                         // EXPANSION
                         else
                         {
-                            copy.DoMove(transitionsNoStats.RandomItem(localVars.random));
+                            copy.Transition(transitionsNoStats.RandomItem(localVars.random));
 
                             Node n = new Node(copy.CurrentPlayer);
                             tree.TryAdd(copy.Hash, n);
@@ -366,14 +362,14 @@ namespace GameAI.Algorithms.MonteCarlo
                             }
                         }
                         Transition bestTransition = allTransitions[indexOfBestTransition];
-                        copy.DoMove(bestTransition);
+                        copy.Transition(bestTransition);
                         path.Add(tree[bestTransition.Hash]);
                     }
 
                     // EXPANSION
                     else
                     {
-                        copy.DoMove(transitionsNoStats.RandomItem(rng));
+                        copy.Transition(transitionsNoStats.RandomItem(rng));
 
                         Node n = new Node(copy.CurrentPlayer);
                         tree.Add(copy.Hash, n);
@@ -480,14 +476,14 @@ namespace GameAI.Algorithms.MonteCarlo
                             }
                         }
                         Transition bestTransition = allTransitions[indexOfBestTransition];
-                        copy.DoMove(bestTransition);
+                        copy.Transition(bestTransition);
                         path.Add(tree[bestTransition.Hash]);
                     }
 
                     // EXPANSION
                     else
                     {
-                        copy.DoMove(transitionsNoStats.RandomItem(rng));
+                        copy.Transition(transitionsNoStats.RandomItem(rng));
 
                         Node n = new Node(copy.CurrentPlayer);
                         tree.Add(copy.Hash, n);

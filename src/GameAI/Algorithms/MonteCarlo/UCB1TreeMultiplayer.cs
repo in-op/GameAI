@@ -11,13 +11,9 @@ namespace GameAI.Algorithms.MonteCarlo
             ICopyable<TGame>,
             IInt64Hash,
             IGameOver,
-            ICurrentPlayer<TPlayer>
+            ICurrentPlayer<TPlayer>,
+            ITransition<Transition>
         {
-            /// <summary>
-            /// Perform the specified transition. Implementations
-            /// must update the hash value.
-            /// </summary>
-            void DoMove(Transition t);
             /// <summary>
             /// Perform any random move. To optimize this method,
             /// omit the use and update of the hash value.
