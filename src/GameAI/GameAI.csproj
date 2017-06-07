@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ICurrentPlayer.cs" />
     <Compile Include="IDoMove.cs" />
     <Compile Include="IGameOver.cs" />
     <Compile Include="IInt64Hash.cs" />

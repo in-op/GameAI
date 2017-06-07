@@ -17,7 +17,8 @@ namespace GameAI.MonteCarlo
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
             IDoMove<TMove>,
-            IGameOver
+            IGameOver,
+            ICurrentPlayer
         {
             /// <summary>
             /// Returns a list of all legal moves
@@ -30,10 +31,6 @@ namespace GameAI.MonteCarlo
             /// </summary>
             /// <param name="player">The player.</param>
             bool IsWinner(int player);
-            /// <summary>
-            /// Returns the current player.
-            /// </summary>
-            int GetCurrentPlayer();
         }
         
 
@@ -46,7 +43,7 @@ namespace GameAI.MonteCarlo
         /// <param name="simulations">The number of simulations to perform.</param>
         public static TMove ParallelSearch<TMove>(IGame<TMove> game, int simulations)
         {
-            int aiPlayer = game.GetCurrentPlayer();
+            int aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
@@ -107,7 +104,7 @@ namespace GameAI.MonteCarlo
         public static TMove Search<TMove>(IGame<TMove> game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
-            int aiPlayer = game.GetCurrentPlayer();
+            int aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());

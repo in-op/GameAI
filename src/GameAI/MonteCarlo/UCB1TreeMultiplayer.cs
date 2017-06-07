@@ -8,13 +8,9 @@ namespace GameAI.MonteCarlo
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
             IInt64Hash,
-            IGameOver
+            IGameOver,
+            ICurrentPlayer
         {
-            /// <summary>
-            /// Returns the current player, represented as an int.
-            /// All n players are represented as a number 0,..,n - 1.
-            /// </summary>
-            int GetCurrentPlayer();
             /// <summary>
             /// Perform the specified transition. Implementations
             /// must update the hash value.

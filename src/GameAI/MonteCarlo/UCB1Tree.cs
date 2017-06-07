@@ -21,12 +21,9 @@ namespace GameAI.MonteCarlo
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
             IInt64Hash,
-            IGameOver
+            IGameOver,
+            ICurrentPlayer
         {
-            /// <summary>
-            /// Returns the current player in int representation.
-            /// </summary>
-            int GetCurrentPlayer();
             /// <summary>
             /// Perform the specified transition. Implementations must update the hash value.
             /// </summary>
@@ -90,7 +87,7 @@ namespace GameAI.MonteCarlo
         public static Transition<TMove> ParallelSearch<TMove>(IGame<TMove> game, long milliseconds)
         {
             ConcurrentDictionary<long, Node> tree = new ConcurrentDictionary<long, Node>();
-            tree.TryAdd(game.Hash, new Node(game.GetCurrentPlayer()));
+            tree.TryAdd(game.Hash, new Node(game.CurrentPlayer));
             Stopwatch sw = new Stopwatch();
             sw.Start();
             ParallelNET35.Parallel.For(0L, Int64.MaxValue,
@@ -139,7 +136,7 @@ namespace GameAI.MonteCarlo
                         {
                             copy.DoMove(transitionsNoStats.RandomItem(localVars.random));
 
-                            Node n = new Node(copy.GetCurrentPlayer());
+                            Node n = new Node(copy.CurrentPlayer);
                             tree.TryAdd(copy.Hash, n);
                             localVars.path.Add(n);
 
@@ -205,7 +202,7 @@ namespace GameAI.MonteCarlo
         public static Transition<TMove> ParallelSearch<TMove>(IGame<TMove> game, int simulations)
         {
             ConcurrentDictionary<long, Node> tree = new ConcurrentDictionary<long, Node>();
-            tree.TryAdd(game.Hash, new Node(game.GetCurrentPlayer()));
+            tree.TryAdd(game.Hash, new Node(game.CurrentPlayer));
             
 
             ParallelNET35.Parallel.For(0, simulations,
@@ -252,7 +249,7 @@ namespace GameAI.MonteCarlo
                         {
                             copy.DoMove(transitionsNoStats.RandomItem(localVars.random));
 
-                            Node n = new Node(copy.GetCurrentPlayer());
+                            Node n = new Node(copy.CurrentPlayer);
                             tree.TryAdd(copy.Hash, n);
                             localVars.path.Add(n);
 
@@ -333,7 +330,7 @@ namespace GameAI.MonteCarlo
         public static Transition<TMove> Search<TMove>(IGame<TMove> game, long milliseconds)
         {
             Dictionary<long, Node> tree = new Dictionary<long, Node>();
-            tree.Add(game.Hash, new Node(game.GetCurrentPlayer()));
+            tree.Add(game.Hash, new Node(game.CurrentPlayer));
 
             List<Node> path = new List<Node>();
 
@@ -384,7 +381,7 @@ namespace GameAI.MonteCarlo
                     {
                         copy.DoMove(transitionsNoStats.RandomItem(rng));
 
-                        Node n = new Node(copy.GetCurrentPlayer());
+                        Node n = new Node(copy.CurrentPlayer);
                         tree.Add(copy.Hash, n);
                         path.Add(n);
 
@@ -449,7 +446,7 @@ namespace GameAI.MonteCarlo
         public static Transition<TMove> Search<TMove>(IGame<TMove> game, int simulations)
         {
             Dictionary<long, Node> tree = new Dictionary<long, Node>();
-            tree.Add(game.Hash, new Node(game.GetCurrentPlayer()));
+            tree.Add(game.Hash, new Node(game.CurrentPlayer));
 
             List<Node> path = new List<Node>();
 
@@ -499,7 +496,7 @@ namespace GameAI.MonteCarlo
                     {
                         copy.DoMove(transitionsNoStats.RandomItem(rng));
 
-                        Node n = new Node(copy.GetCurrentPlayer());
+                        Node n = new Node(copy.CurrentPlayer);
                         tree.Add(copy.Hash, n);
                         path.Add(n);
 
