@@ -18,13 +18,9 @@ namespace GameAI.MonteCarlo
             ICopyable<IGame<TMove>>,
             IDoMove<TMove>,
             IGameOver,
-            ICurrentPlayer
+            ICurrentPlayer,
+            ILegalMoves<TMove>
         {
-            /// <summary>
-            /// Returns a list of all legal moves
-            /// possible from the current gamestate.
-            /// </summary>
-            List<TMove> GetLegalMoves();
             /// <summary>
             /// Returns whether the input player
             /// is a winner in the current gamestate.

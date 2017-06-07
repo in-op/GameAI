@@ -15,13 +15,9 @@ namespace GameAI.MiniMax
         /// </summary>
         public interface IGame<TMove> :
             IDoMove<TMove>,
-            IGameOver
+            IGameOver,
+            ILegalMoves<TMove>
         {
-            /// <summary>
-            /// Returns a list of legal moves
-            /// for the current gamestate.
-            /// </summary>
-            List<TMove> GetLegalMoves();
             /// <summary>
             /// Update the gamestate to
             /// completely undo the previous move.
