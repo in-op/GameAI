@@ -1,4 +1,6 @@
-﻿namespace GameAI.MiniMax
+﻿using GameAI.GameInterfaces;
+
+namespace GameAI.Algorithms.MiniMax
 {
     /// <summary>
     /// A method class to select moves in games

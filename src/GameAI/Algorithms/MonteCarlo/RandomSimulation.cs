@@ -4,8 +4,9 @@ using SystemExtensions;
 using SystemExtensions.Random;
 using SystemExtensions.Copying;
 using System.Threading;
+using GameAI.GameInterfaces;
 
-namespace GameAI.MonteCarlo
+namespace GameAI.Algorithms.MonteCarlo
 {
     public static class RandomSimulation<TGame, TMove, TPlayer>
         where TGame : RandomSimulation<TGame, TMove, TPlayer>.IGame

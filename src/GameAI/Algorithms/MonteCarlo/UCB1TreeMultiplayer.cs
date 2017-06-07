@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using SystemExtensions.Copying;
+using GameAI.GameInterfaces;
 
-namespace GameAI.MonteCarlo
+namespace GameAI.Algorithms.MonteCarlo
 {
     public static class UCB1TreeMultiplayer<TGame, TMove, TPlayer>
         where TGame : UCB1TreeMultiplayer<TGame, TMove, TPlayer>.IGame

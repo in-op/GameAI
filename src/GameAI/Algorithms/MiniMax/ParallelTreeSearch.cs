@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using SystemExtensions.Copying;
+using GameAI.GameInterfaces;
 
-namespace GameAI.MiniMax
+namespace GameAI.Algorithms.MiniMax
 {
     /// <summary>
     /// A method class to select moves in games

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GameAI
+namespace GameAI.GameInterfaces
 {
     public interface ILegalMoves<TMove>
     {

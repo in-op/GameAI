@@ -5,8 +5,9 @@ using System.Diagnostics;
 using System.Threading;
 using SystemExtensions.Copying;
 using SystemExtensions.Random;
+using GameAI.GameInterfaces;
 
-namespace GameAI.MonteCarlo
+namespace GameAI.Algorithms.MonteCarlo
 {
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace GameAI
+﻿namespace GameAI.GameInterfaces
 {
     public interface IGameOver
     {
