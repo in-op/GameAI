@@ -12,7 +12,8 @@ namespace GameAI.Algorithms.MonteCarlo
             IInt64Hash,
             IGameOver,
             ICurrentPlayer<TPlayer>,
-            ITransition<Transition>
+            ITransition<Transition>,
+            ILegalTransitions<Transition>
         {
             /// <summary>
             /// Perform any random move. To optimize this method,
@@ -24,7 +25,6 @@ namespace GameAI.Algorithms.MonteCarlo
             /// that specifies, for that player, a win (+1), loss (-1), or tie (0).
             /// </summary>
             int[] GetOutcome();
-            List<Transition> GetLegalTransitions();
         }
 
         public class Transition

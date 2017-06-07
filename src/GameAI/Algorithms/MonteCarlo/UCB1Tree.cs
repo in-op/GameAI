@@ -25,16 +25,13 @@ namespace GameAI.Algorithms.MonteCarlo
             IGameOver,
             ICurrentPlayer<TPlayer>,
             IWinner<TPlayer>,
-            ITransition<Transition>
+            ITransition<Transition>,
+            ILegalTransitions<Transition>
         {
             /// <summary>
             /// Perform any random move. To optimize this method, omit the use and update of the hash value.
             /// </summary>
             void DoRandomMove();
-            /// <summary>
-            /// Returns all the legal transitions the current state of the game can perform.
-            /// </summary>
-            List<Transition> GetLegalTransitions();
         }
 
         /// <summary>
