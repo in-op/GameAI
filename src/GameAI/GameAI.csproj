@@ -69,6 +69,7 @@
     <Compile Include="GameInterfaces\IInt64Hash.cs" />
     <Compile Include="GameInterfaces\ILegalMoves.cs" />
     <Compile Include="GameInterfaces\ILegalTransitions.cs" />
+    <Compile Include="GameInterfaces\IRollout.cs" />
     <Compile Include="GameInterfaces\ITransition.cs" />
     <Compile Include="GameInterfaces\IUndoMove.cs" />
     <Compile Include="GameInterfaces\IWinner.cs" />

@@ -13,13 +13,9 @@ namespace GameAI.Algorithms.MonteCarlo
             IGameOver,
             ICurrentPlayer<TPlayer>,
             ITransition<Transition>,
-            ILegalTransitions<Transition>
+            ILegalTransitions<Transition>,
+            IRollout
         {
-            /// <summary>
-            /// Perform any random move. To optimize this method,
-            /// omit the use and update of the hash value.
-            /// </summary>
-            void DoRandomMove();
             /// <summary>
             /// Returns an array, indexed by numeric player representations,
             /// that specifies, for that player, a win (+1), loss (-1), or tie (0).

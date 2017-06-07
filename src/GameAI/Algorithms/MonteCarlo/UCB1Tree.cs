@@ -26,13 +26,9 @@ namespace GameAI.Algorithms.MonteCarlo
             ICurrentPlayer<TPlayer>,
             IWinner<TPlayer>,
             ITransition<Transition>,
-            ILegalTransitions<Transition>
-        {
-            /// <summary>
-            /// Perform any random move. To optimize this method, omit the use and update of the hash value.
-            /// </summary>
-            void DoRandomMove();
-        }
+            ILegalTransitions<Transition>,
+            IRollout
+        { }
 
         /// <summary>
         /// A custom data structure for storing a move and the gamestate's resultant hash code after performing that move.
@@ -134,8 +130,7 @@ namespace GameAI.Algorithms.MonteCarlo
                     }
 
                     // ROLLOUT
-                    while (!copy.IsGameOver())
-                        copy.DoRandomMove();
+                    copy.Rollout();
 
                     // BACKPROP
                     foreach (Node n in localVars.path)
@@ -246,8 +241,7 @@ namespace GameAI.Algorithms.MonteCarlo
                     }
 
                     // ROLLOUT
-                    while (!copy.IsGameOver())
-                        copy.DoRandomMove();
+                    copy.Rollout();
 
                     // BACKPROP
                     foreach (Node n in localVars.path)
@@ -377,8 +371,7 @@ namespace GameAI.Algorithms.MonteCarlo
                 }
 
                 // ROLLOUT
-                while (!copy.IsGameOver())
-                    copy.DoRandomMove();
+                copy.Rollout();
 
                 // BACKPROP
                 foreach (Node n in path)
@@ -491,8 +484,7 @@ namespace GameAI.Algorithms.MonteCarlo
                 }
 
                 // ROLLOUT
-                while (!copy.IsGameOver())
-                    copy.DoRandomMove();
+                copy.Rollout();
 
                 // BACKPROP
                 foreach (Node n in path)
