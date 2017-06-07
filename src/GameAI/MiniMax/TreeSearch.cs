@@ -5,8 +5,8 @@
     /// that are two-player, back-and-forth,
     /// deterministic, and zero-sum or zero-sum-tie.
     /// </summary>
-    public static class TreeSearch<TGame, TMove>
-        where TGame : TreeSearch<TGame, TMove>.IGame
+    public static class TreeSearch<TGame, TMove, TPlayer>
+        where TGame : TreeSearch<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
         /// An interface for Games that wish to use the MiniMax AI.
@@ -15,13 +15,10 @@
             IDoMove<TMove>,
             IGameOver,
             ILegalMoves<TMove>,
-            IUndoMove
-        {
-            /// <summary>
-            /// Return the score for the player whos turn it is in this current gamestate.
-            /// </summary>
-            int CurrentPlayersScore();
-        }
+            IUndoMove,
+            ICurrentPlayer<TPlayer>,
+            IScore<TPlayer>
+        { }
 
         /// <summary>
         /// Returns the best Move found by performing
@@ -50,7 +47,7 @@
         private static int NegaMax(TGame game)
         {
             if (game.IsGameOver())
-                return game.CurrentPlayersScore();
+                return game.Score(game.CurrentPlayer);
 
             int bestScore = int.MinValue;
             int score;

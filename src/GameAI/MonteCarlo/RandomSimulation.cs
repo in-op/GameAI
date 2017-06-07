@@ -7,8 +7,8 @@ using System.Threading;
 
 namespace GameAI.MonteCarlo
 {
-    public static class RandomSimulation<TGame, TMove>
-        where TGame : RandomSimulation<TGame, TMove>.IGame
+    public static class RandomSimulation<TGame, TMove, TPlayer>
+        where TGame : RandomSimulation<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
         /// Interface for games that wish to use the MonteCarlo AI.
@@ -17,16 +17,10 @@ namespace GameAI.MonteCarlo
             ICopyable<TGame>,
             IDoMove<TMove>,
             IGameOver,
-            ICurrentPlayer,
-            ILegalMoves<TMove>
-        {
-            /// <summary>
-            /// Returns whether the input player
-            /// is a winner in the current gamestate.
-            /// </summary>
-            /// <param name="player">The player.</param>
-            bool IsWinner(int player);
-        }
+            ICurrentPlayer<TPlayer>,
+            ILegalMoves<TMove>,
+            IWinner<TPlayer>
+        { }
         
 
 
@@ -37,7 +31,7 @@ namespace GameAI.MonteCarlo
         /// <param name="simulations">The number of simulations to perform.</param>
         public static TMove ParallelSearch(TGame game, int simulations)
         {
-            int aiPlayer = game.CurrentPlayer;
+            TPlayer aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
@@ -97,7 +91,7 @@ namespace GameAI.MonteCarlo
         public static TMove Search(TGame game, int simulations)
         {
             // hoist all declarations out of the main loop for performance
-            int aiPlayer = game.CurrentPlayer;
+            TPlayer aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
             MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());

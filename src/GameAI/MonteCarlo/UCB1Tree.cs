@@ -12,8 +12,8 @@ namespace GameAI.MonteCarlo
     /// <summary>
     /// A method class for selecting moves in determinsitic, two-player, back-and-forth, zero-sum or zero-sum-tie games
     /// </summary>
-    public static class UCB1Tree<TGame, TMove>
-        where TGame : UCB1Tree<TGame, TMove>.IGame
+    public static class UCB1Tree<TGame, TMove, TPlayer>
+        where TGame : UCB1Tree<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
         /// The interface games must implement in order to use the Monte Carlo tree search algorithm.
@@ -22,7 +22,8 @@ namespace GameAI.MonteCarlo
             ICopyable<TGame>,
             IInt64Hash,
             IGameOver,
-            ICurrentPlayer
+            ICurrentPlayer<TPlayer>,
+            IWinner<TPlayer>
         {
             /// <summary>
             /// Perform the specified transition. Implementations must update the hash value.
@@ -33,10 +34,6 @@ namespace GameAI.MonteCarlo
             /// Perform any random move. To optimize this method, omit the use and update of the hash value.
             /// </summary>
             void DoRandomMove();
-            /// <summary>
-            /// Returns the player who won, represented as an int.
-            /// </summary>
-            int WhoWon();
             /// <summary>
             /// Returns all the legal transitions the current state of the game can perform.
             /// </summary>
@@ -150,7 +147,7 @@ namespace GameAI.MonteCarlo
                     foreach (Node n in localVars.path)
                     {
                         Interlocked.Add(ref n.plays, 1);
-                        if (copy.WhoWon() == n.player) Interlocked.Add(ref n.wins, 1);
+                        if (copy.IsWinner(n.player)) Interlocked.Add(ref n.wins, 1);
                     }
 
                     return localVars;
@@ -262,7 +259,7 @@ namespace GameAI.MonteCarlo
                     foreach (Node n in localVars.path)
                     {
                         Interlocked.Add(ref n.plays, 1);
-                        if (copy.WhoWon() == n.player) Interlocked.Add(ref n.wins, 1);
+                        if (copy.IsWinner(n.player)) Interlocked.Add(ref n.wins, 1);
                     }
 
                     return localVars;
@@ -393,7 +390,7 @@ namespace GameAI.MonteCarlo
                 foreach (Node n in path)
                 {
                     n.plays++;
-                    if (copy.WhoWon() == n.player) n.wins++;
+                    if (copy.IsWinner(n.player)) n.wins++;
                 }
             }
 
@@ -507,7 +504,7 @@ namespace GameAI.MonteCarlo
                 foreach (Node n in path)
                 {
                     n.plays++;
-                    if (copy.WhoWon() == n.player) n.wins++;
+                    if (copy.IsWinner(n.player)) n.wins++;
                 }
             }
 
@@ -556,7 +553,7 @@ namespace GameAI.MonteCarlo
         {
             public int plays;
             public int wins;
-            public int player;
+            public TPlayer player;
 
             public double ScoreForCurrentPlayer()
             {
@@ -572,7 +569,7 @@ namespace GameAI.MonteCarlo
 
             private Node() { }
 
-            public Node(int player)
+            public Node(TPlayer player)
             {
                 this.player = player;
                 plays = 0;

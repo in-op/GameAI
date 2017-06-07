@@ -3,14 +3,14 @@ using SystemExtensions.Copying;
 
 namespace GameAI.MonteCarlo
 {
-    public static class UCB1TreeMultiplayer<TGame, TMove>
-        where TGame : UCB1TreeMultiplayer<TGame, TMove>.IGame
+    public static class UCB1TreeMultiplayer<TGame, TMove, TPlayer>
+        where TGame : UCB1TreeMultiplayer<TGame, TMove, TPlayer>.IGame
     {
         public interface IGame :
             ICopyable<TGame>,
             IInt64Hash,
             IGameOver,
-            ICurrentPlayer
+            ICurrentPlayer<TPlayer>
         {
             /// <summary>
             /// Perform the specified transition. Implementations

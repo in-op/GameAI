@@ -1,10 +1,10 @@
 ﻿namespace GameAI
 {
-    public interface ICurrentPlayer
+    public interface ICurrentPlayer<TPlayer>
     {
         /// <summary>
         /// Gets the player whose turn it is in the current gamestate.
         /// </summary>
-        int CurrentPlayer { get; }
+        TPlayer CurrentPlayer { get; }
     }
 }

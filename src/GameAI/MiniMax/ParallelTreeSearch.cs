@@ -8,8 +8,8 @@ namespace GameAI.MiniMax
     /// that are two-player, back-and-forth,
     /// deterministic, and zero-sum or zero-sum-tie.
     /// </summary>
-    public static class ParallelTreeSearch<TGame, TMove>
-        where TGame : ParallelTreeSearch<TGame, TMove>.IGame
+    public static class ParallelTreeSearch<TGame, TMove, TPlayer>
+        where TGame : ParallelTreeSearch<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
         /// An interface for Games that wish to use the MiniMax AI.
@@ -19,13 +19,10 @@ namespace GameAI.MiniMax
             IDoMove<TMove>,
             IGameOver,
             ILegalMoves<TMove>,
-            IUndoMove
-        {
-            /// <summary>
-            /// Return the score for the player whos turn it is in this current gamestate.
-            /// </summary>
-            int CurrentPlayersScore();
-        }
+            IUndoMove,
+            ICurrentPlayer<TPlayer>,
+            IScore<TPlayer>
+        { }
 
         /// <summary>
         /// Returns the best Move found by performing
@@ -67,7 +64,7 @@ namespace GameAI.MiniMax
         private static int NegaMax(TGame game)
         {
             if (game.IsGameOver())
-                return game.CurrentPlayersScore();
+                return game.Score(game.CurrentPlayer);
 
             int bestScore = int.MinValue;
             int score;
