@@ -20,7 +20,8 @@ namespace GameAI.MonteCarlo
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
-            IInt64Hash
+            IInt64Hash,
+            IGameOver
         {
             /// <summary>
             /// Returns the current player in int representation.
@@ -35,10 +36,6 @@ namespace GameAI.MonteCarlo
             /// Perform any random move. To optimize this method, omit the use and update of the hash value.
             /// </summary>
             void DoRandomMove();
-            /// <summary>
-            /// Returns true if game is over, false otherwise.
-            /// </summary>
-            bool IsGameOver();
             /// <summary>
             /// Returns the player who won, represented as an int.
             /// </summary>

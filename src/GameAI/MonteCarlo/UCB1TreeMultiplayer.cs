@@ -7,7 +7,8 @@ namespace GameAI.MonteCarlo
     {
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
-            IInt64Hash
+            IInt64Hash,
+            IGameOver
         {
             /// <summary>
             /// Returns the current player, represented as an int.
@@ -24,7 +25,6 @@ namespace GameAI.MonteCarlo
             /// omit the use and update of the hash value.
             /// </summary>
             void DoRandomMove();
-            bool IsGameOver();
             /// <summary>
             /// Returns an array, indexed by numeric player representations,
             /// that specifies, for that player, a win (+1), loss (-1), or tie (0).

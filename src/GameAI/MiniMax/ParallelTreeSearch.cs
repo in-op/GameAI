@@ -16,7 +16,8 @@ namespace GameAI.MiniMax
         /// </summary>
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
-            IDoMove<TMove>
+            IDoMove<TMove>,
+            IGameOver
         {
             /// <summary>
             /// Returns a list of legal moves
@@ -28,10 +29,6 @@ namespace GameAI.MiniMax
             /// completely undo the previous move.
             /// </summary>
             void UndoMove();
-            /// <summary>
-            /// Returns whether the game is over or not.
-            /// </summary>
-            bool IsGameOver();
             /// <summary>
             /// Return the score for the player whos
             /// turn it is in this current gamestate.

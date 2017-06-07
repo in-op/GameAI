@@ -16,17 +16,14 @@ namespace GameAI.MonteCarlo
         /// <typeparam name="TMove">The type of the moves in the IGame implementation.</typeparam>
         public interface IGame<TMove> :
             ICopyable<IGame<TMove>>,
-            IDoMove<TMove>
+            IDoMove<TMove>,
+            IGameOver
         {
             /// <summary>
             /// Returns a list of all legal moves
             /// possible from the current gamestate.
             /// </summary>
             List<TMove> GetLegalMoves();
-            /// <summary>
-            /// Returns whether the game is over or not.
-            /// </summary>
-            bool IsGameOver();
             /// <summary>
             /// Returns whether the input player
             /// is a winner in the current gamestate.
