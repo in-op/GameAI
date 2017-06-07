@@ -5,7 +5,9 @@ namespace GameAI.MonteCarlo
 {
     public static class UCB1TreeMultiplayer
     {
-        public interface IGame<TMove> : ICopyable<IGame<TMove>>
+        public interface IGame<TMove> :
+            ICopyable<IGame<TMove>>,
+            IInt64Hash
         {
             /// <summary>
             /// Returns the current player, represented as an int.
@@ -29,7 +31,6 @@ namespace GameAI.MonteCarlo
             /// </summary>
             int[] GetOutcome();
             List<Transition<TMove>> GetLegalTransitions();
-            long GetHash();
         }
 
         public class Transition<TMove>
