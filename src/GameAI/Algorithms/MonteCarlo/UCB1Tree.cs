@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using SystemExtensions.Copying;
 using SystemExtensions.Random;
 using GameAI.GameInterfaces;
+using ParallelNET35.Concurrent;
 
 namespace GameAI.Algorithms.MonteCarlo
 {
@@ -77,7 +77,7 @@ namespace GameAI.Algorithms.MonteCarlo
             sw.Start();
             ParallelNET35.Parallel.For(0L, Int64.MaxValue,
 
-                () => { return new ThreadLocalVars(ThreadLocalRandom.Instance, new List<Node>(50)); },
+                () => { return new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)); },
 
                 (i, loop, localVars) =>
                 {
@@ -122,8 +122,9 @@ namespace GameAI.Algorithms.MonteCarlo
                             copy.Transition(transitionsNoStats.RandomItem(localVars.random));
 
                             Node n = new Node(copy.CurrentPlayer);
-                            tree.TryAdd(copy.Hash, n);
-                            localVars.path.Add(n);
+
+                            if (tree.TryAdd(copy.Hash, n)) localVars.path.Add(n);
+                            else localVars.path.Add(tree[copy.Hash]);
 
                             break;
                         }
@@ -190,7 +191,7 @@ namespace GameAI.Algorithms.MonteCarlo
 
             ParallelNET35.Parallel.For(0, simulations,
 
-                () => { return new ThreadLocalVars(ThreadLocalRandom.Instance, new List<Node>(50)); },
+                () => { return new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)); },
                 
                 (i, loop, localVars) =>
                 {
@@ -233,8 +234,8 @@ namespace GameAI.Algorithms.MonteCarlo
                             copy.Transition(transitionsNoStats.RandomItem(localVars.random));
 
                             Node n = new Node(copy.CurrentPlayer);
-                            tree.TryAdd(copy.Hash, n);
-                            localVars.path.Add(n);
+                            if (tree.TryAdd(copy.Hash, n)) localVars.path.Add(n);
+                            else localVars.path.Add(tree[copy.Hash]);
 
                             break;
                         }
