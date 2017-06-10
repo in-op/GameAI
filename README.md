@@ -1,9 +1,9 @@
-# 0 - Summary
+# Summary
 C# implementations of artificial intelligence to play games.
 Current algorithms:
-* [MiniMax](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#21-minimax)
-* [Pure Monte-Carlo simulation](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#22-pure-monte-carlo)
-* [Monte-Carlo-Tree-Search with Upper Confidence Bounds](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#23-monte-carlo-tree-search-with-upper-confidence-bounds-mcts-ucb1)
+* [MiniMax](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#minimax)
+* [Pure Monte-Carlo simulation](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#pure-monte-carlo)
+* [Monte-Carlo-Tree-Search with Upper Confidence Bounds](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#monte-carlo-tree-search-with-upper-confidence-bounds-mcts-ucb1)
 
 Algorithms can play 2-player, back-and-forth,
 zero-sum games of perfect information
@@ -24,7 +24,7 @@ C# 4.0, .NET 3.5 compatible for integrating in Unity projects.
 
 
 
-# 1 - Game Interfaces
+# Game Interfaces
 To run an algorithm on a game implementation, have the game
 implement the `IGame` interface associated with the respective
 algorithm, e.g. `MiniMax.TreeSearch<TGame, TMove, TPlayer>.IGame`.
@@ -35,7 +35,7 @@ are shared by the algorithms, this makes it easy for games
 to implement multiple algorithms' `IGame` interfaces
 without having to implement them each explicitly.
 
-### 1.1 - ICurrentPlayer\<TPlayer\>
+### ICurrentPlayer\<TPlayer\>
 ```c#
 TPlayer CurrentPlayer { get; }
 ```
@@ -44,7 +44,7 @@ turn it is within the current gamestate. It
 is parameterized over the client-defined player
 type.
 
-### 1.2 - IDoMove\<TMove\>
+### IDoMove\<TMove\>
 ```c#
 void DoMove(TMove move)
 ```
@@ -53,7 +53,7 @@ to reflect the execution of the input move.
 It is parameterized over the client-defined
 move type.
 
-### 1.3 - IGameOver
+### IGameOver
 ```c#
 bool IsGameOver()
 ```
@@ -62,7 +62,7 @@ a terminal (game-over) gamestate. Returns
 false if there are still possible moves
 to perform.
 
-### 1.4 - IInt64Hash
+### IInt64Hash
 ```c#
 long Hash { get; }
 ```
@@ -72,7 +72,7 @@ distinct gamestate should generate a
 distinct hash value. Consider using
 Zobrist hashing.
 
-### 1.5 - ILegalMoves\<TMove\>
+### ILegalMoves\<TMove\>
 ```c#
 List<TMove> GetLegalMoves()
 ```
@@ -81,7 +81,7 @@ can be performed in the current gamestate.
 It is parameterized over the client-defined
 move type.
 
-### 1.6 - ILegalTransitions\<TTransition\>
+### ILegalTransitions\<TTransition\>
 ```c#
 List<TTransition> GetLegalTransitions()
 ```
@@ -90,7 +90,7 @@ can be performed in the current gamestate.
 It is parameterized over the internal
 transition type respective to the algorithm.
 
-### 1.7 - IRollout
+### IRollout
 ```c#
 void Rollout()
 ```
@@ -101,7 +101,7 @@ heavy playouts (weighted towards moves
 that would normally occur in-game) can
 be implemented by the client.
 
-### 1.8 - IScore
+### IScore
 ```c#
 int Score(TPlayer player)
 ```
@@ -112,7 +112,7 @@ utility of performing possible moves. It
 is parameterized over the client-defined
 player type.
 
-### 1.9 - ITransition\<TTransition\>
+### ITransition\<TTransition\>
 ```c#
 void Transition(TTransition t)
 ```
@@ -121,7 +121,7 @@ state and update its hash with the given
 value. It is parameterized over the
 client-defined transition type.
 
-### 1.10 - IUndoMove
+### IUndoMove
 ```c#
 void UndoMove()
 ```
@@ -131,7 +131,7 @@ Used by recursive algorithms to maintain
 correct state in the client game when
 climbing up a gametree to previous states.
 
-### 1.11 - IWinner\<TPlayer\>
+### IWinner\<TPlayer\>
 ```c#
 bool IsWinner(TPlayer player)
 ```
@@ -146,20 +146,20 @@ player type.
 
 
 
-# 2 - Algorithms
+# Algorithms
 
-### 2.1 MiniMax
+### MiniMax
 MiniMax is a recursive search algorithm which solves games
 of simple complexity, such as Tic-Tac-Toe.
 
-### 2.2 Pure Monte-Carlo
+### Pure Monte-Carlo
 Pure Monte-Carlo simulation creates deep copies
 of the current gamestate and plays random moves
 upon it until the game ends. It calculates which
 possible move - from the set of all legal moves in
 the initial state - has the highest win-rate.
 
-### 2.3 Monte-Carlo Tree-Search with Upper Confidence Bounds (MCTS UCB1)
+### Monte-Carlo Tree-Search with Upper Confidence Bounds (MCTS UCB1)
 A domain-general upgrade to pure Monte-Carlo, MCTS UCB1
 generates a game tree rooted at the
 initial gamestate. Each simulation adds one
