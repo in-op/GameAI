@@ -2,7 +2,7 @@
 C# implementations of artificial intelligence to play games.
 Current algorithms:
 * [MiniMax](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#21-minimax)
-* [Pure Monte-Carlo simulation]
+* [Pure Monte-Carlo simulation](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#22-pure-monte-carlo)
 * [Monte-Carlo-Tree-Search with Upper Confidence Bounds]
 
 Algorithms can play 2-player, back-and-forth,
