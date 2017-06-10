@@ -1,7 +1,7 @@
 # 0 - Summary
 C# implementations of artificial intelligence to play games.
 Current algorithms:
-* [MiniMax]
+* [MiniMax](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#21-minimax)
 * [Pure Monte-Carlo simulation]
 * [Monte-Carlo-Tree-Search with Upper Confidence Bounds]
 
