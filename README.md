@@ -52,7 +52,7 @@ perform its calculation. Many properties and methods
 are shared across algorithms, so each IGame interface
 is actually a blank interface that merely inherits
 from multiple,
-[individual interfaces](https://github.com/CampbellAlexander/GameAI/edit/master/README.md#interfaces) 
+[individual interfaces](https://github.com/CampbellAlexander/GameAI/blob/master/README.md#interfaces) 
 which each define one piece of functionality that a
 game can implement.
 
