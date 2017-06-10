@@ -1,8 +1,11 @@
 # 0 - Summary
 C# implementations of artificial intelligence to play games.
-Includes pure MiniMax, pure Monte-Carlo simulation, and
-Monte-Carlo-Tree-Search with Upper Confidence Bounds. All
-algorithms support both single-threaded and multi-threaded
+Current algorithms:
+* MiniMax
+* Pure Monte-Carlo simulation
+* Monte-Carlo-Tree-Search with Upper Confidence Bounds
+
+All algorithms support both single-threaded and multi-threaded
 versions. Algorithms can play 2-player, back-and-forth,
 zero-sum games of perfect information (Chess, TicTacToe,
 Connect-Four, Checkers, Go, Blokus, etc.). C# 4.0, .NET
