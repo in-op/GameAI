@@ -160,7 +160,7 @@ possible move - from the set of all legal moves in
 the initial state - has the highest win-rate.
 
 ### 2.3 Monte-Carlo Tree-Search with Upper Confidence Bounds (MCTS UCB1)
-An domain-general upgrade to pure Monte-Carlo, MCTS UCB1
+A domain-general upgrade to pure Monte-Carlo, MCTS UCB1
 generates a game tree rooted at the
 initial gamestate. Each simulation adds one
 node to the tree. As the tree expands upon
