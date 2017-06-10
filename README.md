@@ -5,7 +5,8 @@ Monte-Carlo-Tree-Search with Upper Confidence Bounds. All
 algorithms support both single-threaded and multi-threaded
 versions. Algorithms can play 2-player, back-and-forth,
 zero-sum games of perfect information (Chess, TicTacToe,
-Connect-Four, Checkers, Go, Blokus, etc.).
+Connect-Four, Checkers, Go, Blokus, etc.). C# 4.0, .NET
+3.5 compatible for integrating in Unity projects.
 
 
 
