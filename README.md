@@ -38,6 +38,7 @@ The algorithms are each generically parameterized across three types:
 * TGame
 * TMove
 * TPlayer
+
 These types are defined by the client game implementation.
 TGame is the type of the game itself. TMove is
 whatever type is use to represent moves
@@ -68,7 +69,15 @@ any algorithm that requires it.
 ### MiniMax
 [MiniMax](https://en.wikipedia.org/wiki/Minimax)
 is a recursive search algorithm which solves games
-of simple complexity, such as Tic-Tac-Toe.
+of simple complexity, such as Tic-Tac-Toe. It 
+explores the game tree in a depth-first manner,
+performing moves until reaching a terminal
+(game-over) state, and sending this value
+back up the tree. It scores each node of the game
+tree by selecting either the move with the maximum score
+(for the AI player), or the minimum score (for the opponent).
+This implementation uses the Negamax to simplify
+the design.
 
 ### Pure Monte-Carlo
 Pure [Monte-Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_method)
