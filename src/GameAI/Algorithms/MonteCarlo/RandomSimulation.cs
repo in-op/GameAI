@@ -35,7 +35,7 @@ namespace GameAI.Algorithms.MonteCarlo
             TPlayer aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
-            MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
+            MoveStats[] moveStats = JaggedArray.Create(count, () => new MoveStats());
 
             ParallelNET35.Parallel.For(0, simulations,
 
@@ -95,7 +95,7 @@ namespace GameAI.Algorithms.MonteCarlo
             TPlayer aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
-            MoveStats[] moveStats = JaggedArray.Create(count, new MoveStats());
+            MoveStats[] moveStats = JaggedArray.Create(count, () => new MoveStats());
             int moveIndex;
             TGame copy;
             Random rng = new Random();

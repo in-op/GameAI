@@ -41,7 +41,7 @@ namespace GameAI.Algorithms.MiniMax
 
                 () => { return game.DeepCopy(); },
 
-                delegate(int i, ParallelNET35.Parallel.ParallelLoopState state, TGame copy)
+                (i, state, copy) =>
                 {
                     copy.DoMove(moves[i]);
                     int score = -NegaMax(copy);
