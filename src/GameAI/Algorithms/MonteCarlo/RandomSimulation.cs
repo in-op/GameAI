@@ -133,16 +133,14 @@ namespace GameAI.Algorithms.MonteCarlo
 
 
 
-        private class MoveStats
+        private struct MoveStats
         {
             public int executions;
             public int victories;
 
             public double Score()
             {
-                double vics = victories;
-                double execs = executions;
-                return vics / execs;
+                return (double)victories / executions;
             }
         }
     }
