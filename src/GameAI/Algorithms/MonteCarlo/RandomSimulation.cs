@@ -7,6 +7,9 @@ using GameAI.GameInterfaces;
 
 namespace GameAI.Algorithms.MonteCarlo
 {
+    /// <summary>
+    /// Method class for Monte Carlo simulation, exposing both iterative and parallel search methods.
+    /// </summary>
     public static class RandomSimulation<TGame, TMove, TPlayer>
         where TGame : RandomSimulation<TGame, TMove, TPlayer>.IGame
     {
