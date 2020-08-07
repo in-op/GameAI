@@ -48,21 +48,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ParallelNET35">
-      <HintPath>..\..\..\Parallel\src\ParallelNET35\bin\Release\ParallelNET35.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="SystemExtensions, Version=0.5.6364.2573, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SystemExtensions\SystemExtensions\bin\Release\SystemExtensions.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameInterfaces\ICopyable.cs" />
     <Compile Include="GameInterfaces\ICurrentPlayer.cs" />
     <Compile Include="GameInterfaces\IDoMove.cs" />
     <Compile Include="GameInterfaces\IGameOver.cs" />
@@ -80,6 +74,8 @@
     <Compile Include="Algorithms\MonteCarlo\UCB1TreeMultiplayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GameInterfaces\IScore.cs" />
+    <Compile Include="RandomFactory.cs" />
+    <Compile Include="Extensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

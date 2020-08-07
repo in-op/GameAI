@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SystemExtensions.Copying;
+using System.Threading.Tasks;
 using GameAI.GameInterfaces;
 
 namespace GameAI.Algorithms.MiniMax
@@ -37,7 +37,7 @@ namespace GameAI.Algorithms.MiniMax
             TMove bestMove = default(TMove);
             List<TMove> moves = game.GetLegalMoves();
 
-            ParallelNET35.Parallel.For(0, moves.Count,
+            Parallel.For(0, moves.Count,
 
                 () => { return game.DeepCopy(); },
 

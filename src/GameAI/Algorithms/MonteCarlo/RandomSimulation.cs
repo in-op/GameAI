@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SystemExtensions.Random;
-using SystemExtensions.Copying;
 using System.Threading;
+using System.Threading.Tasks;
 using GameAI.GameInterfaces;
 
 namespace GameAI.Algorithms.MonteCarlo
@@ -39,19 +38,19 @@ namespace GameAI.Algorithms.MonteCarlo
             int count = legalMoves.Count;
             MoveStats[] moveStats = new MoveStats[count];
 
-            ParallelNET35.Parallel.For(0, simulations,
+            Parallel.For(0, simulations,
 
-                () => { return ThreadLocalRandom.NewRandom(); },
+                () => { return RandomFactory.Create(); },
 
                 (i, loop, localRandom) =>
             {
-                int moveIndex = localRandom.Next(0, count);
+                int moveIndex = localRandom.Value.Next(0, count);
                 TGame copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())
                     copy.DoMove(
-                        copy.GetLegalMoves().RandomItem(localRandom));
+                        copy.GetLegalMoves().RandomItem(localRandom.Value));
 
                 Interlocked.Add(ref moveStats[moveIndex].executions, 1);
                 if (copy.IsWinner(aiPlayer))

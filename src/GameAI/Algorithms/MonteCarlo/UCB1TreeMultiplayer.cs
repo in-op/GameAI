@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using SystemExtensions.Copying;
-using GameAI.GameInterfaces;
+﻿using GameAI.GameInterfaces;
 
 namespace GameAI.Algorithms.MonteCarlo
 {
