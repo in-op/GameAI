@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using SystemExtensions.Copying;
-using SystemExtensions.Random;
+using System.Threading.Tasks;
 using GameAI.GameInterfaces;
-using ParallelNET35.Concurrent;
 
 namespace GameAI.Algorithms.MonteCarlo
 {
@@ -75,9 +74,9 @@ namespace GameAI.Algorithms.MonteCarlo
             tree.TryAdd(game.Hash, new Node(game.CurrentPlayer));
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            ParallelNET35.Parallel.For(0L, Int64.MaxValue,
+            Parallel.For(0L, Int64.MaxValue,
 
-                () => { return new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)); },
+                () => { return new ThreadLocalVars(RandomFactory.Create(), new List<Node>(50)); },
 
                 (i, loop, localVars) =>
                 {
@@ -119,7 +118,7 @@ namespace GameAI.Algorithms.MonteCarlo
                         // EXPANSION
                         else
                         {
-                            copy.Transition(transitionsNoStats.RandomItem(localVars.random));
+                            copy.Transition(transitionsNoStats.RandomItem(localVars.random.Value));
 
                             Node n = new Node(copy.CurrentPlayer);
 
@@ -189,9 +188,9 @@ namespace GameAI.Algorithms.MonteCarlo
             tree.TryAdd(game.Hash, new Node(game.CurrentPlayer));
             
 
-            ParallelNET35.Parallel.For(0, simulations,
+            Parallel.For(0, simulations,
 
-                () => { return new ThreadLocalVars(ThreadLocalRandom.NewRandom(), new List<Node>(50)); },
+                () => { return new ThreadLocalVars(RandomFactory.Create(), new List<Node>(50)); },
                 
                 (i, loop, localVars) =>
                 {
@@ -231,7 +230,7 @@ namespace GameAI.Algorithms.MonteCarlo
                         // EXPANSION
                         else
                         {
-                            copy.Transition(transitionsNoStats.RandomItem(localVars.random));
+                            copy.Transition(transitionsNoStats.RandomItem(localVars.random.Value));
 
                             Node n = new Node(copy.CurrentPlayer);
                             if (tree.TryAdd(copy.Hash, n)) localVars.path.Add(n);
@@ -568,10 +567,10 @@ namespace GameAI.Algorithms.MonteCarlo
 
         private class ThreadLocalVars
         {
-            internal Random random;
+            internal ThreadLocal<Random> random;
             internal List<Node> path;
 
-            internal ThreadLocalVars(Random random, List<Node> path)
+            internal ThreadLocalVars(ThreadLocal<Random> random, List<Node> path)
             {
                 this.random = random;
                 this.path = path;
