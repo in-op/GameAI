@@ -24,8 +24,6 @@ namespace GameAI.Algorithms.MonteCarlo
             IWinner<TPlayer>
         { }
         
-
-
         /// <summary>
         /// Returns the move found to have highest win-rate after performing, in parallel, the specified number of Monte-Carlo simulations on the input game.
         /// </summary>
@@ -44,13 +42,13 @@ namespace GameAI.Algorithms.MonteCarlo
 
                 (i, loop, localRandom) =>
             {
-                int moveIndex = localRandom.Value.Next(0, count);
+                int moveIndex = localRandom.Next(0, count);
                 TGame copy = game.DeepCopy();
                 copy.DoMove(legalMoves[moveIndex]);
 
                 while (!copy.IsGameOver())
                     copy.DoMove(
-                        copy.GetLegalMoves().RandomItem(localRandom.Value));
+                        copy.GetLegalMoves().RandomItem(localRandom));
 
                 Interlocked.Add(ref moveStats[moveIndex].executions, 1);
                 if (copy.IsWinner(aiPlayer))
@@ -62,7 +60,6 @@ namespace GameAI.Algorithms.MonteCarlo
                 (x) => { }
 
             );
-
             
             int bestMoveFound = 0;
             double bestScoreFound = 0f;
@@ -82,8 +79,6 @@ namespace GameAI.Algorithms.MonteCarlo
             return legalMoves[bestMoveFound];
 
         }
-
-
 
         /// <summary>
         /// Returns the move found to have highest win-rate after performing the specified number of Monte-Carlo simulations on the input game.
@@ -129,10 +124,6 @@ namespace GameAI.Algorithms.MonteCarlo
 
             return legalMoves[bestMoveFound];
         }
-
-
-
-
 
         private struct MoveStats
         {
