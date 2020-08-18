@@ -5,15 +5,13 @@ using GameAI.GameInterfaces;
 namespace GameAI.Algorithms.MiniMax
 {
     /// <summary>
-    /// A method class to select moves in games
-    /// that are two-player, back-and-forth,
-    /// deterministic, and zero-sum or zero-sum-tie.
+    /// A static class to run a parallel MiniMax algorithm on a game.
     /// </summary>
     public static class ParallelTreeSearch<TGame, TMove, TPlayer>
         where TGame : ParallelTreeSearch<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
-        /// An interface for Games that wish to use the MiniMax AI.
+        /// Interface implemented by games to run the MiniMax <c cref="Search">Search</c> algorithm.
         /// </summary>
         public interface IGame :
             ICopyable<TGame>,
@@ -26,7 +24,7 @@ namespace GameAI.Algorithms.MiniMax
         { }
 
         /// <summary>
-        /// Returns the best Move found by performing
+        /// Return the best <c cref="TMove">TMove</c> found by performing
         /// a full MiniMax gamestate search in parallel.
         /// </summary>
         /// <param name="game">The gamestate from which to begin the search.</param>
@@ -34,12 +32,12 @@ namespace GameAI.Algorithms.MiniMax
         {
             object locker = new object();
             int bestScore = int.MinValue;
-            TMove bestMove = default(TMove);
+            TMove bestMove = default;
             List<TMove> moves = game.GetLegalMoves();
 
             Parallel.For(0, moves.Count,
 
-                () => { return game.DeepCopy(); },
+                () => game.DeepCopy(),
 
                 (i, state, copy) =>
                 {
@@ -57,7 +55,8 @@ namespace GameAI.Algorithms.MiniMax
                     return copy;
                 },
 
-                (copy) => { });
+                copy => { }
+            );
 
             return bestMove;
         }
@@ -73,7 +72,8 @@ namespace GameAI.Algorithms.MiniMax
             {
                 game.DoMove(move);
                 score = -NegaMax(game);
-                if (score > bestScore) bestScore = score;
+                if (score > bestScore)
+                    bestScore = score;
                 game.UndoMove();
             }
             return bestScore;

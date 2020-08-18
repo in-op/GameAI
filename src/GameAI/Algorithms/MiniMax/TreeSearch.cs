@@ -3,15 +3,13 @@
 namespace GameAI.Algorithms.MiniMax
 {
     /// <summary>
-    /// A method class to select moves in games
-    /// that are two-player, back-and-forth,
-    /// deterministic, and zero-sum or zero-sum-tie.
+    /// A static class to run the MiniMax algorithm on a game.
     /// </summary>
     public static class TreeSearch<TGame, TMove, TPlayer>
         where TGame : TreeSearch<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
-        /// An interface for Games that wish to use the MiniMax AI.
+        /// Interface implemented by games to run the MiniMax <c cref="Search">Search</c> algorithm.
         /// </summary>
         public interface IGame :
             IDoMove<TMove>,
@@ -23,14 +21,14 @@ namespace GameAI.Algorithms.MiniMax
         { }
 
         /// <summary>
-        /// Returns the best Move found by performing
+        /// Return the best <c cref="TMove">TMove</c> found by performing
         /// a full MiniMax gamestate search.
         /// </summary>
         /// <param name="game">The gamestate from which to begin the search.</param>
         public static TMove Search(TGame game)
         {
             int bestScore = int.MinValue;
-            TMove bestMove = default(TMove);
+            TMove bestMove = default;
             int score;
             foreach (TMove move in game.GetLegalMoves())
             {
@@ -57,7 +55,8 @@ namespace GameAI.Algorithms.MiniMax
             {
                 game.DoMove(move);
                 score = -NegaMax(game);
-                if (score > bestScore) bestScore = score;
+                if (score > bestScore)
+                    bestScore = score;
                 game.UndoMove();
             }
             return bestScore;
