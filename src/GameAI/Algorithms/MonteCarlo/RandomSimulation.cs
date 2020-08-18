@@ -7,13 +7,14 @@ using GameAI.GameInterfaces;
 namespace GameAI.Algorithms.MonteCarlo
 {
     /// <summary>
-    /// Method class for Monte Carlo simulation, exposing both iterative and parallel search methods.
+    /// A static class to run random Monte Carlo simulations on a game,
+    /// with both parallel and single-threaded algorithms.
     /// </summary>
     public static class RandomSimulation<TGame, TMove, TPlayer>
         where TGame : RandomSimulation<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
-        /// Interface for games that wish to use the MonteCarlo AI.
+        /// Interface implmented by games to use the MonteCarlo algorithm.
         /// </summary>
         public interface IGame :
             ICopyable<TGame>,
@@ -25,9 +26,9 @@ namespace GameAI.Algorithms.MonteCarlo
         { }
         
         /// <summary>
-        /// Returns the move found to have highest win-rate after performing, in parallel, the specified number of Monte-Carlo simulations on the input game.
+        /// Return the move with the highest win-rate after performing in parallel the specified number of simulations on the game.
         /// </summary>
-        /// <param name="game">The current game.</param>
+        /// <param name="game">The starting gamestate.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
         public static TMove ParallelSearch(TGame game, int simulations)
         {
@@ -38,27 +39,26 @@ namespace GameAI.Algorithms.MonteCarlo
 
             Parallel.For(0, simulations,
 
-                () => { return RandomFactory.Create(); },
+                () => RandomFactory.Create(),
 
                 (i, loop, localRandom) =>
-            {
-                int moveIndex = localRandom.Next(0, count);
-                TGame copy = game.DeepCopy();
-                copy.DoMove(legalMoves[moveIndex]);
+                {
+                    int moveIndex = localRandom.Next(0, count);
+                    TGame copy = game.DeepCopy();
+                    copy.DoMove(legalMoves[moveIndex]);
 
-                while (!copy.IsGameOver())
-                    copy.DoMove(
-                        copy.GetLegalMoves().RandomItem(localRandom));
+                    while (!copy.IsGameOver())
+                        copy.DoMove(
+                            copy.GetLegalMoves().RandomItem(localRandom));
 
-                Interlocked.Add(ref moveStats[moveIndex].executions, 1);
-                if (copy.IsWinner(aiPlayer))
-                    Interlocked.Add(ref moveStats[moveIndex].victories, 1);
+                    Interlocked.Add(ref moveStats[moveIndex].executions, 1);
+                    if (copy.IsWinner(aiPlayer))
+                        Interlocked.Add(ref moveStats[moveIndex].victories, 1);
 
-                return localRandom;
-            },
+                    return localRandom;
+                },
 
-                (x) => { }
-
+                x => { }
             );
             
             int bestMoveFound = 0;
@@ -81,13 +81,12 @@ namespace GameAI.Algorithms.MonteCarlo
         }
 
         /// <summary>
-        /// Returns the move found to have highest win-rate after performing the specified number of Monte-Carlo simulations on the input game.
+        /// Return the move with the highest win-rate after performing the specified number of simulations on the game.
         /// </summary>
-        /// <param name="game">The current game.</param>
+        /// <param name="game">The starting gamestate.</param>
         /// <param name="simulations">The number of simulations to perform.</param>
         public static TMove Search(TGame game, int simulations)
         {
-            // hoist all declarations out of the main loop for performance
             TPlayer aiPlayer = game.CurrentPlayer;
             List<TMove> legalMoves = game.GetLegalMoves();
             int count = legalMoves.Count;
@@ -107,7 +106,8 @@ namespace GameAI.Algorithms.MonteCarlo
                         copy.GetLegalMoves().RandomItem(rng));
 
                 moveStats[moveIndex].executions++;
-                if (copy.IsWinner(aiPlayer)) moveStats[moveIndex].victories++;
+                if (copy.IsWinner(aiPlayer))
+                    moveStats[moveIndex].victories++;
             }
 
             int bestMoveFound = 0;
@@ -127,13 +127,10 @@ namespace GameAI.Algorithms.MonteCarlo
 
         private struct MoveStats
         {
-            public int executions;
-            public int victories;
+            internal int executions;
+            internal int victories;
 
-            public double Score()
-            {
-                return (double)victories / executions;
-            }
+            internal double Score() => (double)victories / executions;
         }
     }
 }

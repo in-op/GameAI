@@ -9,13 +9,14 @@ using GameAI.GameInterfaces;
 namespace GameAI.Algorithms.MonteCarlo
 {
     /// <summary>
-    /// A method class for selecting moves in determinsitic, two-player, back-and-forth, zero-sum or zero-sum-tie games
+    /// A static class to run UCB1 Tree Monte Carlo simulations on a game,
+    /// with both parallel and single-threaded algorithms.
     /// </summary>
     public static class UCB1Tree<TGame, TMove, TPlayer>
         where TGame : UCB1Tree<TGame, TMove, TPlayer>.IGame
     {
         /// <summary>
-        /// The interface games must implement in order to use the Monte Carlo tree search algorithm.
+        /// Interface implemented by games to use the Monte Carlo tree search algorithm.
         /// </summary>
         public interface IGame :
             ICopyable<TGame>,
@@ -29,7 +30,7 @@ namespace GameAI.Algorithms.MonteCarlo
         { }
 
         /// <summary>
-        /// A custom data structure for storing a move and the gamestate's resultant hash code after performing that move.
+        /// A data class for storing a move and the gamestate's resultant hash code after performing that move.
         /// </summary>
         public class Transition
         {
@@ -44,7 +45,7 @@ namespace GameAI.Algorithms.MonteCarlo
             public long Hash;
 
             /// <summary>
-            /// Returns a new Transition with the specified move to perform and a hash representing the resulting gamestate.
+            /// Return a new Transition with the specified move to perform and a hash representing the resulting gamestate.
             /// </summary>
             /// <param name="move">The move to perform to execute the transition.</param>
             /// <param name="hash">The hash code of the resulting gamestate after performing the move.</param>
@@ -54,33 +55,29 @@ namespace GameAI.Algorithms.MonteCarlo
                 Hash = hash;
             }
 
-            /// <summary>
-            /// Custom override for debugging and testing purposes.
-            /// </summary>
-            public override string ToString()
-            {
-                return "Move: " + Move.ToString() + ". Hash: " + Hash.ToString();
-            }
+            public override string ToString() => $"Move: {Move} - Hash: {Hash}";
         }
 
         /// <summary>
-        /// Returns the best Transition discovered after performing the specified number of simulations, in parallel, on the game.
+        /// Return the best Transition found after performing in parallel the specified number of simulations on the game.
         /// </summary>
-        /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
-        /// <param name="milliseconds">The length of time the search to run.</param>
+        /// <param name="game">The initial gamestate from which to find the best move for the current player.</param>
+        /// <param name="milliseconds">The length of time to run the search.</param>
         public static Transition ParallelSearch(TGame game, long milliseconds)
         {
             ConcurrentDictionary<long, Node> tree = new ConcurrentDictionary<long, Node>();
             tree.TryAdd(game.Hash, new Node(game.CurrentPlayer));
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
             Parallel.For(0L, Int64.MaxValue,
 
-                () => { return new ThreadLocalVars(RandomFactory.Create(), new List<Node>(50)); },
+                () => new ThreadLocalVars(RandomFactory.Create(), new List<Node>(50)),
 
                 (i, loop, localVars) =>
                 {
-                    if (sw.ElapsedMilliseconds > milliseconds) loop.Stop();
+                    if (sw.ElapsedMilliseconds > milliseconds)
+                        loop.Stop();
 
                     TGame copy = game.DeepCopy();
                     localVars.path.Clear();
@@ -90,9 +87,9 @@ namespace GameAI.Algorithms.MonteCarlo
                     {
                         List<Transition> transitions = copy.GetLegalTransitions();
                         List<Transition> transitionsNoStats = new List<Transition>();
-                        foreach (Transition t in transitions)
-                            if (!tree.ContainsKey(t.Hash))
-                                transitionsNoStats.Add(t);
+                        foreach (Transition transition in transitions)
+                            if (!tree.ContainsKey(transition.Hash))
+                                transitionsNoStats.Add(transition);
 
                         // SELECTION
                         if (transitionsNoStats.Count == 0)
@@ -103,7 +100,7 @@ namespace GameAI.Algorithms.MonteCarlo
                             int indexOfBestTransition = 0;
                             for (int j = 0; j < transitions.Count; j++)
                             {
-                                ucb1Score = tree[transitions[j].Hash].UCBScoreForParent(parentPlays);
+                                ucb1Score = tree[transitions[j].Hash].ParentUCBScore(parentPlays);
                                 if (ucb1Score > bestScore)
                                 {
                                     bestScore = ucb1Score;
@@ -119,12 +116,12 @@ namespace GameAI.Algorithms.MonteCarlo
                         else
                         {
                             copy.Transition(transitionsNoStats.RandomItem(localVars.random));
-
                             Node n = new Node(copy.CurrentPlayer);
 
-                            if (tree.TryAdd(copy.Hash, n)) localVars.path.Add(n);
-                            else localVars.path.Add(tree[copy.Hash]);
-
+                            if (tree.TryAdd(copy.Hash, n))
+                                localVars.path.Add(n);
+                            else
+                                localVars.path.Add(tree[copy.Hash]);
                             break;
                         }
                     }
@@ -133,17 +130,18 @@ namespace GameAI.Algorithms.MonteCarlo
                     copy.Rollout();
 
                     // BACKPROP
-                    foreach (Node n in localVars.path)
+                    foreach (Node node in localVars.path)
                     {
-                        Interlocked.Add(ref n.plays, 1);
-                        if (copy.IsWinner(n.player)) Interlocked.Add(ref n.wins, 1);
+                        Interlocked.Add(ref node.plays, 1);
+                        if (copy.IsWinner(node.player))
+                            Interlocked.Add(ref node.wins, 1);
                     }
 
                     return localVars;
                 },
 
-                (x) => { }
-                );
+                x => { }
+            );
 
             // Simulations are over. Pick the best move, then return it
             List<Transition> allTransitions = game.GetLegalTransitions();
@@ -155,13 +153,13 @@ namespace GameAI.Algorithms.MonteCarlo
 
             for (int i = 0; i < allTransitions.Count; i++)
             {
-                Node n = tree[allTransitions[i].Hash];
+                // Node n = tree[allTransitions[i].Hash];
                 //Console.WriteLine("Move {0}: plays-{1} wins-{2} plyr-{3}", i, n.plays, n.wins, n.player);
 
                 // **NOTE**
                 // The best move chosen is the move with gives the
                 // opponent the least number of victories
-                score = tree[allTransitions[i].Hash].ScoreForCurrentPlayer();
+                score = tree[allTransitions[i].Hash].CurrentPlayerScore();
                 if (score < worstScoreFound)
                 {
                     worstScoreFound = score;
@@ -173,19 +171,18 @@ namespace GameAI.Algorithms.MonteCarlo
         }
 
         /// <summary>
-        /// Returns the best Transition discovered after performing the specified number of simulations, in parallel, on the game.
+        /// Return the best Transition found after performing in parallel the specified number of simulations on the game.
         /// </summary>
-        /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
-        /// <param name="simulations">The number of simulations of the game to perform.</param>
+        /// <param name="game">The initial gamestate from which to find the best move for the current player.</param>
+        /// <param name="simulations">The number of simulations to run on the game.</param>
         public static Transition ParallelSearch(TGame game, int simulations)
         {
             ConcurrentDictionary<long, Node> tree = new ConcurrentDictionary<long, Node>();
             tree.TryAdd(game.Hash, new Node(game.CurrentPlayer));
-            
 
             Parallel.For(0, simulations,
 
-                () => { return new ThreadLocalVars(RandomFactory.Create(), new List<Node>(50)); },
+                () => new ThreadLocalVars(RandomFactory.Create(), new List<Node>(50)),
                 
                 (i, loop, localVars) =>
                 {
@@ -195,11 +192,11 @@ namespace GameAI.Algorithms.MonteCarlo
 
                     while (!copy.IsGameOver())
                     {
-                        List<Transition>  transitions = copy.GetLegalTransitions();
+                        List<Transition> transitions = copy.GetLegalTransitions();
                         List<Transition> transitionsNoStats = new List<Transition>();
-                        foreach (Transition t in transitions)
-                            if (!tree.ContainsKey(t.Hash))
-                                transitionsNoStats.Add(t);
+                        foreach (Transition transition in transitions)
+                            if (!tree.ContainsKey(transition.Hash))
+                                transitionsNoStats.Add(transition);
 
                         // SELECTION
                         if (transitionsNoStats.Count == 0)
@@ -210,7 +207,7 @@ namespace GameAI.Algorithms.MonteCarlo
                             int indexOfBestTransition = 0;
                             for (int j = 0; j < transitions.Count; j++)
                             {
-                                ucb1Score = tree[transitions[j].Hash].UCBScoreForParent(parentPlays);
+                                ucb1Score = tree[transitions[j].Hash].ParentUCBScore(parentPlays);
                                 if (ucb1Score > bestScore)
                                 {
                                     bestScore = ucb1Score;
@@ -227,9 +224,11 @@ namespace GameAI.Algorithms.MonteCarlo
                         {
                             copy.Transition(transitionsNoStats.RandomItem(localVars.random));
 
-                            Node n = new Node(copy.CurrentPlayer);
-                            if (tree.TryAdd(copy.Hash, n)) localVars.path.Add(n);
-                            else localVars.path.Add(tree[copy.Hash]);
+                            Node node = new Node(copy.CurrentPlayer);
+                            if (tree.TryAdd(copy.Hash, node))
+                                localVars.path.Add(node);
+                            else
+                                localVars.path.Add(tree[copy.Hash]);
 
                             break;
                         }
@@ -239,18 +238,18 @@ namespace GameAI.Algorithms.MonteCarlo
                     copy.Rollout();
 
                     // BACKPROP
-                    foreach (Node n in localVars.path)
+                    foreach (Node node in localVars.path)
                     {
-                        Interlocked.Add(ref n.plays, 1);
-                        if (copy.IsWinner(n.player)) Interlocked.Add(ref n.wins, 1);
+                        Interlocked.Add(ref node.plays, 1);
+                        if (copy.IsWinner(node.player))
+                            Interlocked.Add(ref node.wins, 1);
                     }
 
                     return localVars;
                 },
 
-                (x) => { }
-                );
-            
+                x => { }
+            );
 
             // Simulations are over. Pick the best move, then return it
             List<Transition> allTransitions = game.GetLegalTransitions();
@@ -262,14 +261,13 @@ namespace GameAI.Algorithms.MonteCarlo
 
             for (int i = 0; i < allTransitions.Count; i++)
             {
-                Node n = tree[allTransitions[i].Hash];
+                //Node n = tree[allTransitions[i].Hash];
                 //Console.WriteLine("Move {0}: plays-{1} wins-{2} plyr-{3}", i, n.plays, n.wins, n.player);
-
 
                 // **NOTE**
                 // The best move chosen is the move with gives the
                 // opponent the least number of victories
-                score = tree[allTransitions[i].Hash].ScoreForCurrentPlayer();
+                score = tree[allTransitions[i].Hash].CurrentPlayerScore();
                 if (score < worstScoreFound)
                 {
                     worstScoreFound = score;
@@ -281,23 +279,23 @@ namespace GameAI.Algorithms.MonteCarlo
         }
 
         /// <summary>
-        /// Returns the best Transition discovered after performing the specified number of simulations on the game.
+        /// Return the best Transition found after running the UCB1 Tree algorithm for the specified length of time.
         /// </summary>
-        /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
-        /// <param name="milliseconds">The length of time search will run.</param>
+        /// <param name="game">The initial gamestate from which to find the best move for the current player.</param>
+        /// <param name="milliseconds">The length of time the algorithm will run.</param>
         public static Transition Search(TGame game, long milliseconds)
         {
-            Dictionary<long, Node> tree = new Dictionary<long, Node>();
-            tree.Add(game.Hash, new Node(game.CurrentPlayer));
-
+            Dictionary<long, Node> tree = new Dictionary<long, Node>
+            {
+                { game.Hash, new Node(game.CurrentPlayer) }
+            };
             List<Node> path = new List<Node>();
-
             TGame copy;
             List<Transition> allTransitions;
             List<Transition> transitionsNoStats;
-
             Random rng = new Random();
             Stopwatch sw = new Stopwatch();
+
             sw.Start();
             while (sw.ElapsedMilliseconds < milliseconds)
             {
@@ -309,9 +307,9 @@ namespace GameAI.Algorithms.MonteCarlo
                 {
                     allTransitions = copy.GetLegalTransitions();
                     transitionsNoStats = new List<Transition>();
-                    foreach (Transition t in allTransitions)
-                        if (!tree.ContainsKey(t.Hash))
-                            transitionsNoStats.Add(t);
+                    foreach (Transition transition in allTransitions)
+                        if (!tree.ContainsKey(transition.Hash))
+                            transitionsNoStats.Add(transition);
 
                     // SELECTION
                     if (transitionsNoStats.Count == 0)
@@ -322,7 +320,7 @@ namespace GameAI.Algorithms.MonteCarlo
                         int indexOfBestTransition = 0;
                         for (int j = 0; j < allTransitions.Count; j++)
                         {
-                            ucb1Score = tree[allTransitions[j].Hash].UCBScoreForParent(parentPlays);
+                            ucb1Score = tree[allTransitions[j].Hash].ParentUCBScore(parentPlays);
                             if (ucb1Score > bestScore)
                             {
                                 bestScore = ucb1Score;
@@ -339,9 +337,9 @@ namespace GameAI.Algorithms.MonteCarlo
                     {
                         copy.Transition(transitionsNoStats.RandomItem(rng));
 
-                        Node n = new Node(copy.CurrentPlayer);
-                        tree.Add(copy.Hash, n);
-                        path.Add(n);
+                        Node node = new Node(copy.CurrentPlayer);
+                        tree.Add(copy.Hash, node);
+                        path.Add(node);
 
                         break;
                     }
@@ -351,10 +349,11 @@ namespace GameAI.Algorithms.MonteCarlo
                 copy.Rollout();
 
                 // BACKPROP
-                foreach (Node n in path)
+                foreach (Node node in path)
                 {
-                    n.plays++;
-                    if (copy.IsWinner(n.player)) n.wins++;
+                    node.plays++;
+                    if (copy.IsWinner(node.player))
+                        node.wins++;
                 }
             }
 
@@ -368,13 +367,13 @@ namespace GameAI.Algorithms.MonteCarlo
 
             for (int i = 0; i < allTransitions.Count; i++)
             {
-                Node n = tree[allTransitions[i].Hash];
+                //Node n = tree[allTransitions[i].Hash];
                 //Console.WriteLine("Move {0}: plays-{1} wins-{2} plyr-{3}", i, n.plays, n.wins, n.player);
 
                 // **NOTE**
                 // The best move chosen is the move with gives the
                 // opponent the least number of victories
-                score = tree[allTransitions[i].Hash].ScoreForCurrentPlayer();
+                score = tree[allTransitions[i].Hash].CurrentPlayerScore();
                 if (score < worstScoreFound)
                 {
                     worstScoreFound = score;
@@ -386,21 +385,20 @@ namespace GameAI.Algorithms.MonteCarlo
         }
 
         /// <summary>
-        /// Returns the best Transition discovered after performing the specified number of simulations on the game.
+        /// Return the best Transition found after performing the specified number of simulations on the game.
         /// </summary>
-        /// <param name="game">The current state of the game from which to find the best move for the current player.</param>
-        /// <param name="simulations">The number of simulations of the game to perform.</param>
+        /// <param name="game">The initial gamestate from which to find the best move for the current player.</param>
+        /// <param name="simulations">The number of simulations to run on the game.</param>
         public static Transition Search(TGame game, int simulations)
         {
-            Dictionary<long, Node> tree = new Dictionary<long, Node>();
-            tree.Add(game.Hash, new Node(game.CurrentPlayer));
-
+            Dictionary<long, Node> tree = new Dictionary<long, Node>
+            {
+                { game.Hash, new Node(game.CurrentPlayer) }
+            };
             List<Node> path = new List<Node>();
-
             IGame copy;
             List<Transition> allTransitions;
             List<Transition> transitionsNoStats;
-
             Random rng = new Random();
 
             for (int i = 0; i < simulations; i++)
@@ -413,9 +411,9 @@ namespace GameAI.Algorithms.MonteCarlo
                 {
                     allTransitions = copy.GetLegalTransitions();
                     transitionsNoStats = new List<Transition>();
-                    foreach (Transition t in allTransitions)
-                        if (!tree.ContainsKey(t.Hash))
-                            transitionsNoStats.Add(t);
+                    foreach (Transition transition in allTransitions)
+                        if (!tree.ContainsKey(transition.Hash))
+                            transitionsNoStats.Add(transition);
 
                     // SELECTION
                     if (transitionsNoStats.Count == 0)
@@ -426,7 +424,7 @@ namespace GameAI.Algorithms.MonteCarlo
                         int indexOfBestTransition = 0;
                         for (int j = 0; j < allTransitions.Count; j++)
                         {
-                            ucb1Score = tree[allTransitions[j].Hash].UCBScoreForParent(parentPlays);
+                            ucb1Score = tree[allTransitions[j].Hash].ParentUCBScore(parentPlays);
                             if (ucb1Score > bestScore)
                             {
                                 bestScore = ucb1Score;
@@ -443,9 +441,9 @@ namespace GameAI.Algorithms.MonteCarlo
                     {
                         copy.Transition(transitionsNoStats.RandomItem(rng));
 
-                        Node n = new Node(copy.CurrentPlayer);
-                        tree.Add(copy.Hash, n);
-                        path.Add(n);
+                        Node node = new Node(copy.CurrentPlayer);
+                        tree.Add(copy.Hash, node);
+                        path.Add(node);
 
                         break;
                     }
@@ -455,10 +453,11 @@ namespace GameAI.Algorithms.MonteCarlo
                 copy.Rollout();
 
                 // BACKPROP
-                foreach (Node n in path)
+                foreach (Node node in path)
                 {
-                    n.plays++;
-                    if (copy.IsWinner(n.player)) n.wins++;
+                    node.plays++;
+                    if (copy.IsWinner(node.player))
+                        node.wins++;
                 }
             }
 
@@ -472,13 +471,13 @@ namespace GameAI.Algorithms.MonteCarlo
 
             for (int i = 0; i < allTransitions.Count; i++)
             {
-                Node n = tree[allTransitions[i].Hash];
+                //Node n = tree[allTransitions[i].Hash];
                 //Console.WriteLine("Move {0}: plays-{1} wins-{2} plyr-{3}", i, n.plays, n.wins, n.player);
 
                 // **NOTE**
                 // The best move chosen is the move with gives the
                 // opponent the least number of victories
-                score = tree[allTransitions[i].Hash].ScoreForCurrentPlayer();
+                score = tree[allTransitions[i].Hash].CurrentPlayerScore();
                 if (score < worstScoreFound)
                 {
                     worstScoreFound = score;
@@ -490,31 +489,25 @@ namespace GameAI.Algorithms.MonteCarlo
         }
 
         private static double UCB1(double childWins, double childPlays, double parentPlays)
-        {
-            return (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
-        }
+            => (childWins / childPlays) + Math.Sqrt(2f * Math.Log(parentPlays) / childPlays);
 
         private class Node
         {
-            public int plays;
-            public int wins;
-            public TPlayer player;
+            internal int plays;
+            internal int wins;
+            internal TPlayer player;
 
-            public double ScoreForCurrentPlayer()
+            internal double CurrentPlayerScore() => (double)wins / plays;
+
+            internal double ParentUCBScore(int parentPlays)
             {
-                double w = wins;
-                double p = plays;
-                return w / p;
-            }
-
-            public double UCBScoreForParent(int parentPlays)
-            {   // plays - wins indicates how many winners for the opposing player (the player of the parent node)
-                return UCB1(plays - wins, plays, parentPlays);
+                int parentWins = plays - wins;
+                return UCB1(parentWins, plays, parentPlays);
             }
 
             private Node() { }
 
-            public Node(TPlayer player)
+            internal Node(TPlayer player)
             {
                 this.player = player;
                 plays = 0;
@@ -524,8 +517,8 @@ namespace GameAI.Algorithms.MonteCarlo
 
         private class ThreadLocalVars
         {
-            internal Random random;
-            internal List<Node> path;
+            internal readonly Random random;
+            internal readonly List<Node> path;
 
             internal ThreadLocalVars(Random random, List<Node> path)
             {
