@@ -17,7 +17,7 @@ zero-sum games of perfect information. This includes:
 All algorithms support both single-threaded and multi-threaded
 versions.
 
-C# 4.0, .NET 3.5 compatible for integrating in Unity projects.
+C# 7.3, .NET 4.6 compatible for integrating in Unity projects.
 
 
 
